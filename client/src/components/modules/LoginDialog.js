@@ -6,7 +6,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Slide from '@material-ui/core/Slide';
-import SignupDialog from '../signup/SignupDialog';
+import SignupDialog from './SignupDialog';
 import {TextField} from '@material-ui/core';
 import {post} from 'axios';
 
@@ -37,18 +37,24 @@ export default function LoginDialog(props) {
 
     const loginProcess = () => {
         const url = '/api/login';
-        const formData = new FormData();
+        // const formData = new FormData();
 
-        formData.append('STRING_ID', id);
-        formData.append('PASSWORD', pw);
+        // formData.append('STRING_ID', id);
+        // formData.append('PASSWORD', pw);
+        // FormData()를 활용하는 방법도 있으나 json이 훨씬 쉽다.
+
+        const data = {
+            STRING_ID: id,
+            PASSWORD: pw,
+        };
 
         const config = {
             headers: {
-                'content-type': 'multipart/form-data',
+                'content-type': 'application/json',
             },
         };
 
-        return post(url, formData, config);
+        return post(url, data, config);
     };
 
     const handleFormSubmit = () => {
@@ -118,7 +124,7 @@ export default function LoginDialog(props) {
                         このサイトを利用するため、ログインあるいは会員登録をしてください。
                     </DialogContentText>
                     <TextField type='text' label='ID' name='id' onChange={checkIdValidation} /> <br />
-                    <TextField type='text' label='PASSWORD' name='password' onChange={checkPwValidation} />
+                    <TextField type='password' label='PASSWORD' name='password' onChange={checkPwValidation} />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleFormSubmit} color='primary'>

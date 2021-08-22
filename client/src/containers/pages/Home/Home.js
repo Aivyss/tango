@@ -1,5 +1,5 @@
 import {connect} from 'react-redux';
-import LoginDialog from '../../components/login/LoginDialog';
+import Home from '../../../components/pages/Home/Home';
 
 function mapStateToProps(state) {
     return {
@@ -9,7 +9,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        doLogin: param => {
+        loginCheck: param => {
             dispatch({
                 type: 'LOGINED',
                 isLogined: param,
@@ -18,4 +18,4 @@ function mapDispatchToProps(dispatch) {
     };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(LoginDialog);
+export default connect(mapStateToProps, mapDispatchToProps)(Home);

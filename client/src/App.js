@@ -1,8 +1,8 @@
 import './App.css';
-import LoginDialog from './containers/login/LoginDialog';
+import LoginDialog from './containers/modules/LoginDialog';
 import {BrowserRouter, Route, Switch} from 'react-router-dom';
-import Home from './containers/Home/Home';
-import HomeTwo from './components/Home/HomeTwo';
+import Home from './containers/pages/Home/Home';
+import HomeTwo from './components/pages/Home/HomeTwo';
 import {useEffect, useState} from 'react';
 
 function App(props) {

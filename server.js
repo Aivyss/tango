@@ -24,9 +24,10 @@ app.use('/images', express.static('./upload')); // /images url을 ./upload로 �
 
 // 서버 설정
 app.use(express.json());
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({extended: false}));
 
-app.post('/api/login', upload.single('image'), (req, res) => {
+// 로그인 요청
+app.post('/api/login', (req, res) => {
     console.log('USER_ID: ', req.body.STRING_ID);
     console.log('req.body= ', req.body);
     const sql = `SELECT 
@@ -40,6 +41,37 @@ app.post('/api/login', upload.single('image'), (req, res) => {
     connection.query(sql, params, (err, rows, fields) => {
         console.log(rows);
         res.send(rows);
+    });
+});
+
+// 회원가입 요청
+app.post('/api/signup', (req, res) => {
+    const sql = `INSERT INTO USER_TABLE (
+        STRING_ID
+        ,PASSWORD
+    ) VALUES (
+        ?
+        ,?
+    )`;
+    const params = [];
+    params.push(req.body.STRING_ID);
+    params.push(req.body.PASSWORD);
+
+    connection.query(sql, params, (err, rows, fields) => {
+        res.send(rows);
+    });
+});
+
+// 아이디 중복조회 요청
+app.get('/api/checkDuplicated-id', (req, res) => {
+    console.log('아이디 중복조회 요청');
+    const sql = `SELECT ID FROM USER_TABLE WHERE STRING_ID = ?`;
+    const params = [req.query.id];
+    console.log('id= ', req.query.id);
+
+    connection.query(sql, params, (err, rows, field) => {
+        res.send(rows);
+        console.log(err);
     });
 });
 
