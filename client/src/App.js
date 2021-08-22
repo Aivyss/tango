@@ -1,27 +1,34 @@
 import './App.css';
-import LoginDialog from './components/login/LoginDialog';
+import LoginDialog from './containers/login/LoginDialog';
 import {BrowserRouter, Route, Switch} from 'react-router-dom';
-import Home from './components/Home/Home';
+import Home from './containers/Home/Home';
+import HomeTwo from './components/Home/HomeTwo';
 import {useEffect, useState} from 'react';
 
-function App() {
-    const [isLogined, setIsLogined] = useState(false);
+function App(props) {
+    let [isLogined, setIsLogined] = useState(props.isLogined);
 
     useEffect(() => {
-        if (sessionStorage.getItem('id') !== null && sessionStorage.getItem('id') !== undefined) {
-            setIsLogined(true);
-        }
         console.log('useEffect executed');
-        console.log(sessionStorage.getItem('id'));
-    }, []);
+        if (sessionStorage.getItem('id') !== null && sessionStorage.getItem('id') !== undefined) {
+            props.loginCheck(true);
+            setIsLogined(true);
+        } else {
+            props.loginCheck(false);
+            setIsLogined(false);
+        }
+    }, [props.isLogined]);
 
     return (
         <div className='App'>
             <BrowserRouter>
-                {isLogined ? (
+                {props.isLogined ? (
                     <Route exact path='/' component={Home} />
                 ) : (
-                    <Route exact path='/' component={LoginDialog} />
+                    <div>
+                        <HomeTwo />
+                        <Route exact path='/' component={LoginDialog} />
+                    </div>
                 )}
             </BrowserRouter>
         </div>

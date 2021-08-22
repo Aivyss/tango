@@ -6,7 +6,6 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Slide from '@material-ui/core/Slide';
-import App from '../../App';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction='up' ref={ref} {...props} />;
@@ -15,12 +14,10 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 export default function SignupDialog(props) {
     let [open, setOpen] = useState(false);
     console.log('props.open =', props.open);
-    let [comp, setComp] = useState();
 
     const handleClickOpen = () => {};
 
     const handleClose = () => {
-        setComp(App);
         setOpen(false);
     };
 
@@ -53,7 +50,6 @@ export default function SignupDialog(props) {
                     </DialogActions>
                 </Dialog>
             </div>
-            <div children={comp}></div>
         </main>
     );
 }

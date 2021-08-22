@@ -19,6 +19,7 @@ export default function LoginDialog(props) {
     const [signupOpen, setSignupOpen] = React.useState(false);
     const [id, setId] = React.useState('');
     const [pw, setPw] = React.useState('');
+    const [isSend, setIsSend] = React.useState(false);
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -34,39 +35,47 @@ export default function LoginDialog(props) {
         setSignupOpen(true);
     };
 
-    const handleFormSubmit = e => {
-        e.preventDefault();
+    const loginProcess = () => {
+        const url = '/api/login';
+        const formData = new FormData();
 
-        const loginProcess = () => {
-            const url = '/api/login';
-            const formData = new FormData();
-            const config = {
-                'content-type': 'application/json',
-            };
+        formData.append('STRING_ID', id);
+        formData.append('PASSWORD', pw);
 
-            formData.append('id', id);
-            formData.append('password', pw);
-
-            post(url, formData, config);
+        const config = {
+            headers: {
+                'content-type': 'multipart/form-data',
+            },
         };
 
-        if (id.length > 0 && pw.length > 0) {
+        return post(url, formData, config);
+    };
+
+    const handleFormSubmit = () => {
+        if (id.length > 0 && pw.length > 0 && !isSend) {
             loginProcess()
                 .then(res => {
-                    if (res.data.STRING_ID === id && res.data.PASSWORD === pw) {
+                    console.log('🚀 ~ file: LoginDialog.js ~ line 58 ~ handleFormSubmit ~ res', res);
+                    if (res.data[0].STRING_ID === id && res.data[0].PASSWORD === pw) {
                         console.log('로그인 성공');
-                        sessionStorage.setItem('id', res.data.STRING_ID);
-                        sessionStorage.setItem('primaryKey', res.data.ID);
+                        sessionStorage.setItem('id', res.data[0].STRING_ID);
+                        sessionStorage.setItem('primaryKey', res.data[0].ID);
+                        handleClose();
+                        props.doLogin(true);
                     } else {
                         setId('');
                         setPw('');
+                        props.doLogin(false);
                         alert('ログインができませんでした。');
                     }
                 })
-                .catch(() => {
+                .catch(error => {
+                    console.log(error);
+                    props.doLogin(false);
                     console.log('ログインエラー');
                 });
         } else {
+            props.doLogin(false);
             alert('ログイン情報を入力してください。');
         }
     };
