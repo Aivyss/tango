@@ -75,4 +75,14 @@ app.get('/api/checkDuplicated-id', (req, res) => {
     });
 });
 
+app.get('/api/callAllDecks', (req, res) => {
+    const params = [req.query.id];
+    const sql = `SELECT * FROM DECK_TABLE WHERE USER_ID = ?`;
+    console.log('전체덱 호출 id=', req.query.id);
+
+    connection.query(sql, params, (err, rows, field) => {
+        res.send(rows);
+    });
+});
+
 app.listen(port, () => console.log('Listening on port = ', port));

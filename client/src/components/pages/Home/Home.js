@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Button} from '@material-ui/core';
+import DeckList from '../../../containers/modules/DackList';
 
 export default function Home(props) {
     const logout = () => {
@@ -12,6 +13,8 @@ export default function Home(props) {
 
     return (
         <div>
+            <DeckList />
+            <br />
             <Button variant='contained' color='primary'>
                 create Deck
             </Button>
