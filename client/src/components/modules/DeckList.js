@@ -4,6 +4,7 @@ import {makeStyles} from '@material-ui/core/styles';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import {FixedSizeList} from 'react-window';
+import {useHistory} from 'react-router';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -21,16 +22,31 @@ function RenderRow(props) {
     // props의 구조는 { data, style, index, isScrolling }으로 되어있다.
     const {index, style, data} = props;
     let [deckList, setDeckList] = useState([]);
+    let [prevProps, setPrevProps] = useState(null);
+    const history = useHistory();
+
     console.log('🚀 ~ file: DeckList.js ~ line 24 ~ RenderRow ~ deckList', deckList);
 
     useEffect(() => {
         if (deckList.length <= 0) {
-            setDeckList(data);
+            setDeckList(data[0]);
+            setPrevProps(data[1]);
         }
     }, []);
 
     return (
-        <ListItem button style={style} key={index}>
+        <ListItem
+            button
+            style={style}
+            key={index}
+            onClick={() => {
+                const deckId = deckList[index].DECK_ID;
+                if (prevProps !== null) {
+                    prevProps.setTargetDeckId(deckId);
+                    history.push('/deck-room');
+                }
+            }}
+        >
             {deckList.length === 0 ? null : <ListItemText primary={deckList[index].DECK_NAME} />}
         </ListItem>
     );
@@ -61,7 +77,13 @@ export default function VirtualizedList(props) {
     return (
         <div style={{display: 'inline-block'}}>
             <div className={classes.root}>
-                <FixedSizeList height={400} width={600} itemSize={72} itemCount={deckCount} itemData={deckList}>
+                <FixedSizeList
+                    height={400}
+                    width={600}
+                    itemSize={72}
+                    itemCount={deckCount}
+                    itemData={[deckList, props]}
+                >
                     {RenderRow}
                 </FixedSizeList>
             </div>

@@ -1,8 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import {Button} from '@material-ui/core';
 import DeckList from '../../../containers/modules/DackList';
-import {Route} from 'react-router-dom';
+import {Route, Switch} from 'react-router-dom';
 import CreateDeckDialog from '../../../containers/modules/CreateDeckDialog';
+import DeckRoom from '../../../components/pages/deckroom/DeckRoom';
 
 export default function Home(props) {
     const logout = () => {
@@ -19,14 +20,19 @@ export default function Home(props) {
 
     return (
         <div>
-            <DeckList />
-            <br />
-            <Button variant='contained' color='primary' onClick={openDialog}>
-                create Deck
-            </Button>
-            <Button variant='contained' color='primary' onClick={logout}>
-                log out
-            </Button>
+            <Switch>
+                <Route path='/deck-room' component={DeckRoom} />
+                <Route path='/'>
+                    <DeckList />
+                    <br />
+                    <Button variant='contained' color='primary' onClick={openDialog}>
+                        create Deck
+                    </Button>
+                    <Button variant='contained' color='primary' onClick={logout}>
+                        log out
+                    </Button>
+                </Route>
+            </Switch>
             <Route path='/create-deck' component={CreateDeckDialog} />
         </div>
     );

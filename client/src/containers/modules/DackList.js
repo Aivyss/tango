@@ -33,6 +33,12 @@ function mapDispatchToPros(dispatch) {
                     console.log('failed deck loading');
                 });
         },
+        setTargetDeckId: function (deckId) {
+            dispatch({
+                type: 'SET_DECK_ID',
+                deckId: deckId,
+            });
+        },
     };
 }
 
