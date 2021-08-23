@@ -23,7 +23,7 @@ function App(props) {
         <div className='App'>
             <BrowserRouter>
                 {props.isLogined ? (
-                    <Route exact path='/' component={Home} />
+                    <Route path='/' component={Home} />
                 ) : (
                     <div>
                         <HomeTwo />

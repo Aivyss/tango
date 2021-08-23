@@ -81,6 +81,27 @@ app.get('/api/callAllDecks', (req, res) => {
     console.log('전체덱 호출 id=', req.query.id);
 
     connection.query(sql, params, (err, rows, field) => {
+        console.log('덱리스트: ', JSON.parse(JSON.stringify(rows)));
+        res.send(JSON.parse(JSON.stringify(rows)));
+    });
+});
+
+app.get('/api/checkDuplicated-deck-name', (req, res) => {
+    const params = [req.query.name];
+    const sql = `SELECT * FROM DECK_TABLE WHERE DECK_NAME = ?`;
+    console.log('덱 이름 중복 확인=', req.query.name);
+
+    connection.query(sql, params, (err, rows, field) => {
+        res.send(rows);
+    });
+});
+
+app.post('/api/create-deck', (req, res) => {
+    const params = [req.body.deckName, req.body.userId];
+    const sql = `INSERT INTO DECK_TABLE (DECK_NAME, USER_ID) VALUES (?, ?)`;
+    console.log('덱이름 =', params);
+
+    connection.query(sql, params, (err, rows, field) => {
         res.send(rows);
     });
 });

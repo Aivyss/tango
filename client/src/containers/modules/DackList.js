@@ -21,10 +21,13 @@ function mapDispatchToPros(dispatch) {
 
             return get(url)
                 .then(res => {
+                    console.log('get res=', res.data);
                     dispatch({
                         type: 'CALL_ALL_DECK',
                         deckList: res.data,
                     });
+
+                    return res.data;
                 })
                 .catch(() => {
                     console.log('failed deck loading');

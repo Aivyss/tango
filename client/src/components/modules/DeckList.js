@@ -20,15 +20,20 @@ const useStyles = makeStyles(theme => ({
 function RenderRow(props) {
     // props의 구조는 { data, style, index, isScrolling }으로 되어있다.
     const {index, style, data} = props;
-    console.log('🚀 ~ file: DeckList.js ~ line 23 ~ RenderRow ~ data', data);
+    let [deckList, setDeckList] = useState([]);
+    console.log('🚀 ~ file: DeckList.js ~ line 24 ~ RenderRow ~ deckList', deckList);
 
-    return data.map(curr => {
-        return (
-            <ListItem button style={style} key={index}>
-                <ListItemText primary={curr.DECK_NAME} />
-            </ListItem>
-        );
-    });
+    useEffect(() => {
+        if (deckList.length <= 0) {
+            setDeckList(data);
+        }
+    }, []);
+
+    return (
+        <ListItem button style={style} key={index}>
+            {deckList.length === 0 ? null : <ListItemText primary={deckList[index].DECK_NAME} />}
+        </ListItem>
+    );
 }
 
 RenderRow.propTypes = {
@@ -42,11 +47,15 @@ export default function VirtualizedList(props) {
     let [deckList, setDeckList] = useState([]);
 
     useEffect(() => {
-        const id = sessionStorage.getItem('primaryKey');
-        props.callDecksFromApi(id).then(() => {
-            setDeckCount(props.getDeckCount());
-            setDeckList(props.getDeckList());
-        });
+        if (deckCount <= 0) {
+            console.log('useEffect 덱콜');
+            const id = sessionStorage.getItem('primaryKey');
+            props.callDecksFromApi(id).then(array => {
+                console.log(array);
+                setDeckList(array);
+                setDeckCount(array !== undefined ? (array.length <= 0 ? 0 : array.length) : 0);
+            });
+        }
     }, []);
 
     return (

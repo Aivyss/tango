@@ -119,7 +119,10 @@ export default function SignupDialog(props) {
     }, [props.open]);
 
     useEffect(() => {
-        checkDuplicatedId();
+        const leng = id.length;
+        if (leng !== null && leng !== undefined && leng > 0) {
+            checkDuplicatedId();
+        }
     }, [id]);
 
     return (
