@@ -61,17 +61,17 @@ export default function LoginDialog(props) {
         if (id.length > 0 && pw.length > 0 && !isSend) {
             loginProcess()
                 .then(res => {
-                    console.log('🚀 ~ file: LoginDialog.js ~ line 58 ~ handleFormSubmit ~ res', res);
                     if (res.data[0].STRING_ID === id && res.data[0].PASSWORD === pw) {
-                        console.log('로그인 성공');
                         sessionStorage.setItem('id', res.data[0].STRING_ID);
                         sessionStorage.setItem('primaryKey', res.data[0].ID);
-                        handleClose();
-                        props.doLogin(true);
+                        handleClose(); // 모달 닫기
+                        props.doLogin(true); // 리덕스 반영
+                        props.changeLoginStatus(true); // App 컴포넌트 상태변경
                     } else {
                         setId('');
                         setPw('');
                         props.doLogin(false);
+                        props.changeLoginStatus(false);
                         alert('ログインができませんでした。');
                     }
                 })

@@ -6,12 +6,10 @@ function mapStateToProps(state) {
     return {
         checkDuplicatedName: function (name, setIsValidDeck) {
             const url = '/api/checkDuplicated-deck-name?name=' + name;
-            console.log(name);
 
             get(url)
                 .then(res => {
                     const isValid = res.data.length === 0 ? true : false;
-                    console.log(res.data, isValid);
 
                     if (!isValid) {
                         alert('中腹のデックネームです。');

@@ -66,8 +66,6 @@ export default function SignupDialog(props) {
             ? false
             : true;
         const pwIsValid = pw === pwCf;
-        console.log('🚀 ~ file: SignupDialog.js ~ line 71 ~ signup ~ pwIsValid', pwIsValid);
-        console.log('🚀 ~ file: SignupDialog.js ~ line 71 ~ signup ~ isValid', isValid);
 
         if (isValid && pwIsValid && isValidAccount) {
             const url = '/api/signup';

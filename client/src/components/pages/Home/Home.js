@@ -6,16 +6,17 @@ import CreateDeckDialog from '../../../containers/modules/CreateDeckDialog';
 import DeckRoom from '../../../components/pages/deckroom/DeckRoom';
 
 export default function Home(props) {
+    const [openDialog, setOpenDialog] = useState(false);
+
     const logout = () => {
-        console.log('로그아웃 작동');
         sessionStorage.removeItem('id');
         sessionStorage.removeItem('primaryKey');
-        props.loginCheck(false);
-        props.history.push('/');
+        props.loginCheck(false); // redux에서 삭제
+        props.changeLoginStatus(false); // App 상태변경
     };
 
-    const openDialog = () => {
-        props.history.push('/create-deck');
+    const handleOpen = () => {
+        setOpenDialog(!openDialog);
     };
 
     return (
@@ -25,7 +26,7 @@ export default function Home(props) {
                 <Route path='/'>
                     <DeckList />
                     <br />
-                    <Button variant='contained' color='primary' onClick={openDialog}>
+                    <Button variant='contained' color='primary' onClick={handleOpen}>
                         create Deck
                     </Button>
                     <Button variant='contained' color='primary' onClick={logout}>
@@ -33,7 +34,7 @@ export default function Home(props) {
                     </Button>
                 </Route>
             </Switch>
-            <Route path='/create-deck' component={CreateDeckDialog} />
+            <CreateDeckDialog open={openDialog} handleOpen={handleOpen} />
         </div>
     );
 }

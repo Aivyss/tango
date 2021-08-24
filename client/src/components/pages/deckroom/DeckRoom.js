@@ -1,7 +1,7 @@
 import React from 'react';
 import AnkiCard from '../../modules/AnkiCard';
 import {Route, Switch} from 'react-router';
-import DeckStatus from './DeckStatus';
+import DeckStatus from '../../../containers/pages/deckroom/DeckStatus';
 
 export default function DeckRoom() {
     return (

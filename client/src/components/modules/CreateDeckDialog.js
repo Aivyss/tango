@@ -13,13 +13,13 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 export default function CreateDeckDialog(props) {
-    let [open, setOpen] = useState(true);
+    let [open, setOpen] = useState(false);
     let [name, setName] = useState('');
     let [isValidDeck, setIsValidDeck] = useState(true);
 
     const handleClose = () => {
         setOpen(false);
-        setTimeout(props.history.push, 100, '/');
+        props.handleOpen(false); // 부모의 상태 변경
     };
 
     const valueChange = e => {
@@ -31,6 +31,12 @@ export default function CreateDeckDialog(props) {
             handleClose();
         });
     };
+    /*
+        부모 state로부터 받은 값에 의해 자식 상태 변경
+    */
+    useEffect(() => {
+        setOpen(props.open);
+    }, [props.open]);
 
     useEffect(() => {
         const length = name.length;

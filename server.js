@@ -106,4 +106,34 @@ app.post('/api/create-deck', (req, res) => {
     });
 });
 
+// 덱 정보 요청
+app.get('/api/get-deck-info', (req, res) => {
+    const params = [req.query.deckId];
+    console.log('DeckId = ', params);
+
+    // 테스트단
+    res.send({newCard: 25, reviewCard: 10});
+});
+
+app.get('/api/get-kind-of-card/', (req, res) => {
+    const params = [req.query.userId];
+    const sql = `SELECT * FROM KIND_OF_CARD_TABLE WHERE USER_ID = ?`;
+
+    // 테스트부
+    const rows = [
+        {KIND_ID: 1, CARD_NAME: '베이직카드1', USER_ID: 8},
+        {KIND_ID: 2, CARD_NAME: '베이직카드2', USER_ID: 8},
+        {KIND_ID: 3, CARD_NAME: '베이직카드3', USER_ID: 8},
+        {KIND_ID: 4, CARD_NAME: '베이직카드4', USER_ID: 8},
+    ];
+
+    res.send(rows);
+
+    /*
+    connection.query(sql, params, (err, rows, fields) => {
+        res.send(JSON.parser(JSON.stringify(rows)));
+    });
+    */
+});
+
 app.listen(port, () => console.log('Listening on port = ', port));

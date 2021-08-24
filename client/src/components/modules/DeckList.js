@@ -1,10 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
-import {makeStyles} from '@material-ui/core/styles';
+
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import {FixedSizeList} from 'react-window';
 import {useHistory} from 'react-router';
+import {makeStyles} from '@material-ui/core/styles';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -25,8 +26,6 @@ function RenderRow(props) {
     let [prevProps, setPrevProps] = useState(null);
     const history = useHistory();
 
-    console.log('🚀 ~ file: DeckList.js ~ line 24 ~ RenderRow ~ deckList', deckList);
-
     useEffect(() => {
         if (deckList.length <= 0) {
             setDeckList(data[0]);
@@ -40,10 +39,13 @@ function RenderRow(props) {
             style={style}
             key={index}
             onClick={() => {
-                const deckId = deckList[index].DECK_ID;
+                console.log('deckList ~ button ~ deckId: ', deckList[index].DECK_ID);
+                const deckId = Number(deckList[index].DECK_ID);
                 if (prevProps !== null) {
                     prevProps.setTargetDeckId(deckId);
-                    history.push('/deck-room');
+                    prevProps.setDeckInfo(deckId).then(() => {
+                        history.push('/deck-room');
+                    });
                 }
             }}
         >

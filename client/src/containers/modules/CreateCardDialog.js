@@ -5,10 +5,10 @@ import {get, post} from 'axios';
 function mapStateToProps(state) {
     return {
         getDeckId: function () {
-            return state.deckId;
+            return state.protoReducer.deckId;
         },
         getDeckInfo: function () {
-            const url = '/api/get-deck-info/deckId=' + state.deckId;
+            const url = '/api/get-deck-info/deckId=' + state.protoReducer.deckId;
             return get(url)
                 .then(res => {
                     return res.data;
@@ -17,6 +17,22 @@ function mapStateToProps(state) {
                     console.log('덱 인포 불러오기 실패');
                     console.log(err);
                 });
+        },
+        getKindOfCard: function () {
+            const userId = sessionStorage.getItem('primaryKey');
+            const url = '/api/get-kind-of-card/userId=' + userId;
+
+            return get(url).then(res => {
+                const data = res.data;
+
+                return data;
+            });
+        },
+        getCardStructure: function (deckId) {
+            const url = '/api/get-card-structure/deckId=' + deckId;
+            return get(url).then(res => {
+                const data = res.data;
+            });
         },
     };
 }

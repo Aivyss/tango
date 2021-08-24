@@ -5,10 +5,11 @@ import {get} from 'axios';
 function mapStateToProps(state) {
     return {
         getDeckCount: () => {
-            return state.deckList.length ? state.deckList.length : 0;
+            const length = state.protoReducer.deckList.length;
+            return length ? length : 0;
         },
         getDeckList: () => {
-            return state.deckList;
+            return state.protoReducer.deckList;
         },
     };
 }
@@ -34,10 +35,27 @@ function mapDispatchToPros(dispatch) {
                 });
         },
         setTargetDeckId: function (deckId) {
+            console.log('deckList ~ deckId: ', deckId);
             dispatch({
                 type: 'SET_DECK_ID',
                 deckId: deckId,
             });
+        },
+        setDeckInfo: function (deckId) {
+            const url = '/api/get-deck-info/?deckId=' + deckId;
+
+            return get(url)
+                .then(res => {
+                    const data = res.data;
+                    console.log('deckList ~ deckInfo ~ apicall:', data);
+                    dispatch({
+                        type: 'SET_DECK_INFO',
+                        deckInfo: data,
+                    });
+                })
+                .catch(err => {
+                    console.log(err);
+                });
         },
     };
 }
