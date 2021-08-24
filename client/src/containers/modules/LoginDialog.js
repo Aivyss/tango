@@ -3,7 +3,8 @@ import LoginDialog from '../../components/modules/LoginDialog';
 
 function mapStateToProps(state) {
     return {
-        isLogined: state.isLogined,
+        isLogined: state.accountReducer.isLogined,
+        loginDialogIsOpen: state.dialogReducer.loginDialogIsOpen,
     };
 }
 
@@ -11,8 +12,14 @@ function mapDispatchToProps(dispatch) {
     return {
         doLogin: param => {
             dispatch({
-                type: 'LOGINED',
+                type: 'HANDLE_LOGIN',
                 isLogined: param,
+            });
+        },
+        closeLoginDislog: () => {
+            dispatch({
+                type: 'HANDLE_LOGIN_DIALOG',
+                loginDialogIsOpen: false,
             });
         },
     };

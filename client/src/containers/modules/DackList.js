@@ -4,35 +4,17 @@ import {get} from 'axios';
 
 function mapStateToProps(state) {
     return {
-        getDeckCount: () => {
-            const length = state.protoReducer.deckList.length;
-            return length ? length : 0;
-        },
-        getDeckList: () => {
-            return state.protoReducer.deckList;
-        },
+        deckList: state.deckReducer.deckList,
     };
 }
 
 function mapDispatchToPros(dispatch) {
     return {
-        callDecksFromApi: param => {
-            const id = param;
-            const url = '/api/callAllDecks?id=' + id;
-
-            return get(url)
-                .then(res => {
-                    console.log('get res=', res.data);
-                    dispatch({
-                        type: 'CALL_ALL_DECK',
-                        deckList: res.data,
-                    });
-
-                    return res.data;
-                })
-                .catch(() => {
-                    console.log('failed deck loading');
-                });
+        setDeckList: function (deckList) {
+            dispatch({
+                type: 'SET_ALL_DECK',
+                deckList: deckList,
+            });
         },
         setTargetDeckId: function (deckId) {
             console.log('deckList ~ deckId: ', deckId);

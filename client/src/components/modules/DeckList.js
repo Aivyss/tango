@@ -6,6 +6,8 @@ import ListItemText from '@material-ui/core/ListItemText';
 import {FixedSizeList} from 'react-window';
 import {useHistory} from 'react-router';
 import {makeStyles} from '@material-ui/core/styles';
+import {Box} from '@material-ui/core';
+import {get, post} from 'axios';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -13,9 +15,27 @@ const useStyles = makeStyles(theme => ({
         height: 400,
         backgroundColor: theme.palette.background.paper,
         display: 'inline-block',
+        margin: 5,
     },
     wrapper: {
         textAlign: 'center',
+    },
+    centerBox: {
+        width: '100%',
+        height: '100vh',
+        // display: '-webkit-box',
+        // display: '-moz-box',
+        // display: '-ms-flexbox',
+        display: 'flex',
+        WebkitBoxAlign: 'center',
+        MozBoxAlign: 'center',
+        msFlexAlign: 'center',
+        alignItems: 'center' /* 수직 정렬 */,
+
+        WebkitBoxPack: 'center',
+        MozBoxPack: 'center',
+        msFlexPack: 'center',
+        justifyContent: 'center' /* 수평 정렬 */,
     },
 }));
 
@@ -61,33 +81,44 @@ RenderRow.propTypes = {
 
 export default function VirtualizedList(props) {
     const classes = useStyles();
-    let [deckCount, setDeckCount] = useState(0);
-    let [deckList, setDeckList] = useState([]);
+    const callDecksFromApi = param => {
+        const id = param;
+        const url = '/api/callAllDecks?id=' + id;
+
+        return get(url)
+            .then(res => {
+                console.log('get res=', res.data);
+                props.setDeckList(res.data);
+
+                return res.data;
+            })
+            .catch(() => {
+                console.log('failed deck loading');
+            });
+    };
 
     useEffect(() => {
-        if (deckCount <= 0) {
-            console.log('useEffect 덱콜');
-            const id = sessionStorage.getItem('primaryKey');
-            props.callDecksFromApi(id).then(array => {
-                console.log(array);
-                setDeckList(array);
-                setDeckCount(array !== undefined ? (array.length <= 0 ? 0 : array.length) : 0);
-            });
-        }
+        console.log('useEffect 덱콜');
+        const id = sessionStorage.getItem('primaryKey');
+        callDecksFromApi(id);
     }, []);
 
     return (
-        <div style={{display: 'inline-block'}}>
-            <div className={classes.root}>
-                <FixedSizeList
-                    height={400}
-                    width={600}
-                    itemSize={72}
-                    itemCount={deckCount}
-                    itemData={[deckList, props]}
-                >
-                    {RenderRow}
-                </FixedSizeList>
+        <div className={classes.centerBox}>
+            <div>
+                <div className={classes.root}>
+                    <Box boxShadow={3}>
+                        <FixedSizeList
+                            height={400}
+                            width={600}
+                            itemSize={72}
+                            itemCount={props.deckList ? props.deckList.length : 0}
+                            itemData={[props.deckList, props]}
+                        >
+                            {RenderRow}
+                        </FixedSizeList>
+                    </Box>
+                </div>
             </div>
         </div>
     );

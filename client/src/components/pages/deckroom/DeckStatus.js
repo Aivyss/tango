@@ -16,14 +16,7 @@ const useStyles = makeStyles(theme => ({
             margin: theme.spacing(2),
         },
     },
-}));
-
-export default function DeckStatus(props) {
-    const [openCreateCardModal, setOpenCreateCardModal] = useState(false);
-    const [deckId, setDeckId] = useState(-1);
-    const [deckInfo, setDeckInfo] = useState({newCard: 0, reviewCard: 0});
-    const classes = useStyles();
-    const centerStyles = {
+    centerBox: {
         width: '100%',
         height: '100vh',
         // display: '-webkit-box',
@@ -39,11 +32,14 @@ export default function DeckStatus(props) {
         MozBoxPack: 'center',
         msFlexPack: 'center',
         justifyContent: 'center' /* 수평 정렬 */,
-    };
+    },
+}));
 
-    const clickAddCardButton = () => {
-        setOpenCreateCardModal(true);
-    };
+export default function DeckStatus(props) {
+    const [openCreateCardModal, setOpenCreateCardModal] = useState(false);
+    const [deckId, setDeckId] = useState(-1);
+    const [deckInfo, setDeckInfo] = useState({newCard: 0, reviewCard: 0});
+    const classes = useStyles();
 
     const modalClose = () => {
         setOpenCreateCardModal(false);
@@ -55,7 +51,7 @@ export default function DeckStatus(props) {
     }, []);
 
     return (
-        <div style={centerStyles}>
+        <div className={classes.centerBox}>
             <div>
                 <Grid container spacing={3}>
                     <Grid item xs={12}>
@@ -73,11 +69,6 @@ export default function DeckStatus(props) {
                             <CssBaseline />
                             <Container maxWidth='sm'>
                                 <div style={buttonWrapperStyles}>
-                                    <div style={buttonStyles}>
-                                        <Button variant='contained' color='primary' onClick={clickAddCardButton}>
-                                            Add Card
-                                        </Button>
-                                    </div>
                                     <div style={buttonStyles}>
                                         <Button variant='contained' color='primary'>
                                             start

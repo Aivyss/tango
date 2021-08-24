@@ -5,10 +5,10 @@ import {get, post} from 'axios';
 function mapStateToProps(state) {
     return {
         getDeckId: function () {
-            return state.protoReducer.deckId;
+            return state.deckReducer.deckId;
         },
         getDeckInfo: function () {
-            const url = '/api/get-deck-info/deckId=' + state.protoReducer.deckId;
+            const url = '/api/get-deck-info/deckId=' + state.deckReducer.deckId;
             return get(url)
                 .then(res => {
                     return res.data;

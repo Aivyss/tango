@@ -7,41 +7,91 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Slide from '@material-ui/core/Slide';
 import {TextField} from '@material-ui/core';
+import {get, post} from 'axios';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction='up' ref={ref} {...props} />;
 });
 
 export default function CreateDeckDialog(props) {
-    let [open, setOpen] = useState(false);
     let [name, setName] = useState('');
     let [isValidDeck, setIsValidDeck] = useState(true);
 
     const handleClose = () => {
-        setOpen(false);
-        props.handleOpen(false); // 부모의 상태 변경
+        props.closeDeckDialog();
     };
 
     const valueChange = e => {
-        props.valueChange(e, setName);
+        setName(e.target.value);
     };
 
-    const createDeck = () => {
-        props.createDeck(name, setOpen).then(() => {
-            handleClose();
-        });
+    const checkValidation = function (value) {
+        let isValid = false;
+
+        if (value.length <= 0) {
+            alert('文字列を入力してください。');
+        } else if (value.length > 60) {
+            alert('文字列は６０文字以下で入力してください。');
+        } else {
+            isValid = true;
+        }
+
+        return isValid;
     };
-    /*
-        부모 state로부터 받은 값에 의해 자식 상태 변경
-    */
-    useEffect(() => {
-        setOpen(props.open);
-    }, [props.open]);
+
+    const createDeck = function (name, isValidDeck) {
+        const isValid = !checkValidation(name) ? false : true;
+
+        if (isValid && isValidDeck) {
+            const url = '/api/create-deck';
+            const config = {
+                headers: {
+                    'content-type': 'application/json',
+                },
+            };
+            const data = {
+                deckName: name,
+                userId: Number(sessionStorage.getItem('primaryKey')),
+            };
+
+            post(url, data, config)
+                .then(res => {
+                    alert('デックを作成しました。');
+                    window.location.href = '/';
+                })
+                .catch(err => {
+                    console.log('デックの作成のエラー');
+                    console.log(err);
+                })
+                .then(() => {
+                    handleClose();
+                });
+        } else {
+            alert('入力した情報が正しくありません。');
+        }
+    };
+
+    const checkDuplicatedName = function (name, setIsValidDeck) {
+        const url = '/api/checkDuplicated-deck-name?name=' + name;
+
+        get(url)
+            .then(res => {
+                const isValid = res.data.length === 0 ? true : false;
+
+                if (!isValid) {
+                    alert('中腹のデックネームです。');
+                    setIsValidDeck(false);
+                }
+            })
+            .catch(() => {
+                console.log('중복조회 실패');
+            });
+    };
 
     useEffect(() => {
         const length = name.length;
         if (length !== null && length !== undefined && length > 0) {
-            props.checkDuplicatedName(name, isValidDeck, setIsValidDeck);
+            checkDuplicatedName(name, isValidDeck, setIsValidDeck);
         }
     }, [name]);
 
@@ -49,7 +99,7 @@ export default function CreateDeckDialog(props) {
         <main>
             <div>
                 <Dialog
-                    open={open}
+                    open={props.createDeckDialogIsOpen}
                     TransitionComponent={Transition}
                     keepMounted
                     onClose={handleClose}

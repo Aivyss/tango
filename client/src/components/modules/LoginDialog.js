@@ -15,58 +15,42 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 export default function LoginDialog(props) {
-    const [open, setOpen] = React.useState(true);
     const [signupOpen, setSignupOpen] = React.useState(false);
     const [id, setId] = React.useState('');
     const [pw, setPw] = React.useState('');
-    const [isSend, setIsSend] = React.useState(false);
 
-    const handleClickOpen = () => {
-        setOpen(true);
-    };
+    const handleClickOpen = () => {};
 
     const handleClose = () => {
-        setOpen(false);
-        setSignupOpen(false);
+        props.closeLoginDislog();
     };
 
     const signup = () => {
-        setOpen(false);
         setSignupOpen(true);
     };
 
-    const loginProcess = () => {
-        const url = '/api/login';
-        // const formData = new FormData();
+    const doLoginProcess = () => {
+        if (id.length > 0 && pw.length > 0) {
+            const url = '/api/login';
 
-        // formData.append('STRING_ID', id);
-        // formData.append('PASSWORD', pw);
-        // FormData()를 활용하는 방법도 있으나 json이 훨씬 쉽다.
+            const data = {
+                STRING_ID: id,
+                PASSWORD: pw,
+            };
 
-        const data = {
-            STRING_ID: id,
-            PASSWORD: pw,
-        };
+            const config = {
+                headers: {
+                    'content-type': 'application/json',
+                },
+            };
 
-        const config = {
-            headers: {
-                'content-type': 'application/json',
-            },
-        };
-
-        return post(url, data, config);
-    };
-
-    const handleFormSubmit = () => {
-        if (id.length > 0 && pw.length > 0 && !isSend) {
-            loginProcess()
+            post(url, data, config)
                 .then(res => {
                     if (res.data[0].STRING_ID === id && res.data[0].PASSWORD === pw) {
                         sessionStorage.setItem('id', res.data[0].STRING_ID);
                         sessionStorage.setItem('primaryKey', res.data[0].ID);
                         handleClose(); // 모달 닫기
                         props.doLogin(true); // 리덕스 반영
-                        props.changeLoginStatus(true); // App 컴포넌트 상태변경
                     } else {
                         setId('');
                         setPw('');
@@ -111,7 +95,7 @@ export default function LoginDialog(props) {
     return (
         <div>
             <Dialog
-                open={open}
+                open={props.loginDialogIsOpen && !props.isLogined}
                 TransitionComponent={Transition}
                 keepMounted
                 onClose={handleClose}
@@ -127,7 +111,7 @@ export default function LoginDialog(props) {
                     <TextField type='password' label='PASSWORD' name='password' onChange={checkPwValidation} />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleFormSubmit} color='primary'>
+                    <Button onClick={doLoginProcess} color='primary'>
                         Login
                     </Button>
                     <Button onClick={signup} color='primary'>

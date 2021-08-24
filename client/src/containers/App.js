@@ -3,19 +3,12 @@ import App from '../App';
 
 function mapStateToProps(state) {
     return {
-        isLogined: state.protoReducer.isLogined,
+        isLogined: state.accountReducer.isLogined,
     };
 }
 
 function mapDispatchToProps(dispatch) {
-    return {
-        loginCheck: param => {
-            dispatch({
-                type: 'LOGINED',
-                isLogined: param,
-            });
-        },
-    };
+    return {};
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);
