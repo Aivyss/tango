@@ -8,6 +8,27 @@ import {Provider} from 'react-redux';
 // redux-persist
 import {PersistGate} from 'redux-persist/integration/react';
 import configureStore from './_store';
+import {createTheme} from '@material-ui/core/styles';
+import {ThemeProvider} from '@material-ui/styles';
+const theme = createTheme({
+    palette: {
+        primary: {
+            main: '#639ABA',
+        },
+        secondary: {
+            main: '#5B676E',
+        },
+        tertiary: {
+            main: '#C7E1F0',
+        },
+        quaternary: {
+            main: '#7EC4ED',
+        },
+        quinary: {
+            main: '#3B5D70',
+        },
+    },
+});
 
 const {store, persistor} = configureStore();
 console.log('store ~', store);
@@ -15,7 +36,9 @@ console.log('store ~', store);
 ReactDOM.render(
     <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
-            <App />
+            <ThemeProvider theme={theme}>
+                <App />
+            </ThemeProvider>
         </PersistGate>
     </Provider>,
     document.getElementById('root'),

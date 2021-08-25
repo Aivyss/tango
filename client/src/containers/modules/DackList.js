@@ -39,6 +39,13 @@ function mapDispatchToPros(dispatch) {
                     console.log(err);
                 });
         },
+        setTargetDeck: function (deckId, deckName) {
+            dispatch({
+                type: 'SET_TARGET_DECK',
+                targetDeckName: deckName,
+                deckId: deckId,
+            });
+        },
     };
 }
 

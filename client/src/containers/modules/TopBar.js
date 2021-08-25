@@ -5,6 +5,7 @@ function mapStateToProps(state) {
     return {
         createDeckDialogIsOpen: state.dialogReducer.createDeckDialogIsOpen,
         createCardDialogIsOpen: state.dialogReducer.createCardDialogIsOpen,
+        createCardCategoryDialogIsOpen: state.dialogReducer.createCardCategoryDialogIsOpen,
         isLogined: state.accountReducer.isLogined,
     };
 }
@@ -26,13 +27,13 @@ function mapDispatchToProps(dispatch) {
         openCreateCardDialog: function () {
             dispatch({
                 type: 'HANDLE_CREATE_CARD_DIALOG',
-                createDeckDialogIsOpen: true,
+                createCardDialogIsOpen: true,
             });
         },
         closeCreateCardDialog: function () {
             dispatch({
                 type: 'HANDLE_CREATE_CARD_DIALOG',
-                createDeckDialogIsOpen: false,
+                createCardDialogIsOpen: false,
             });
         },
         doLogout: function () {
@@ -43,6 +44,12 @@ function mapDispatchToProps(dispatch) {
             dispatch({
                 type: 'HANDLE_LOGIN_DIALOG',
                 loginDialogIsOpen: true,
+            });
+        },
+        handleCreateCardCategoryDialog: bools => {
+            dispatch({
+                type: 'HANDLE_CREATE_CARD_CATEGORY_DIALOG',
+                createCardCategoryDialogIsOpen: bools,
             });
         },
     };

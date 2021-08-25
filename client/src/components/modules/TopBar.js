@@ -14,6 +14,7 @@ import Add from '@material-ui/icons/Add';
 import ViewCarousel from '@material-ui/icons/ViewCarousel';
 import MeetingRoom from '@material-ui/icons/MeetingRoom';
 import {useHistory} from 'react-router-dom';
+import {DnsSharp} from '@material-ui/icons';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -99,6 +100,10 @@ export default function TopBar(props) {
         history.push('/');
     };
 
+    const handleCreateCardCategoryDialog = () => {
+        props.handleCreateCardCategoryDialog(!props.createCardCategoryDialogIsOpen);
+    };
+
     return (
         <div className={classes.root}>
             <AppBar position='static'>
@@ -113,7 +118,7 @@ export default function TopBar(props) {
                         <Home />
                     </IconButton>
                     <Typography className={classes.title} variant='h6' noWrap>
-                        Anki
+                        Tango
                     </Typography>
                     <div className={classes.btnGroup}>
                         <ButtonGroup variant='contained' color='tertiary' aria-label='contained primary button group'>
@@ -122,7 +127,12 @@ export default function TopBar(props) {
                                 <Inbox />
                                 Deck
                             </Button>
-                            <Button>
+                            <Button onClick={handleCreateCardCategoryDialog}>
+                                <Add fontSize='small' />
+                                <DnsSharp />
+                                Card Categ.
+                            </Button>
+                            <Button onClick={openCreateCardDialog}>
                                 <Add fontSize='small' />
                                 <ViewCarousel />
                                 Card

@@ -1,7 +1,8 @@
 const initState = {
     deckList: [],
-    deckId: -1,
-    deckInfo: {},
+    deckId: -1, // 타겟 덱아이디
+    targetDeckName: '', // 타겟 덱네임
+    deckInfo: {}, // 타겟 덱정보
 };
 
 export default function deckReducer(state = initState, action) {
@@ -13,6 +14,8 @@ export default function deckReducer(state = initState, action) {
             return {...state, deckId: action.deckId};
         case 'SET_DECK_INFO':
             return {...state, deckInfo: action.deckInfo};
+        case 'SET_TARGET_DECK':
+            return {...state, deckName: action.targetDeckName, deckId: action.deckId};
         default:
             return state;
     }

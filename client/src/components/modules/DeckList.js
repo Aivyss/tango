@@ -64,6 +64,7 @@ function RenderRow(props) {
                 if (prevProps !== null) {
                     prevProps.setTargetDeckId(deckId);
                     prevProps.setDeckInfo(deckId).then(() => {
+                        prevProps.setTargetDeck(deckId, deckList[index].DECK_NAME);
                         history.push('/deck-room');
                     });
                 }

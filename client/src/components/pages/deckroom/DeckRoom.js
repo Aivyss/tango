@@ -1,5 +1,5 @@
 import React from 'react';
-import AnkiCard from '../../modules/AnkiCard';
+import TangoCard from '../../modules/TangoCard';
 import {Route, Switch} from 'react-router';
 import DeckStatus from '../../../containers/pages/deckroom/DeckStatus';
 
@@ -11,7 +11,7 @@ export default function DeckRoom() {
                     <DeckStatus />
                 </Route>
                 <Route path='/deck-room/cards'>
-                    <AnkiCard />
+                    <TangoCard />
                 </Route>
             </Switch>
         </>
