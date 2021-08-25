@@ -28,6 +28,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import {TextField} from '@material-ui/core';
 import {Container} from '@material-ui/core';
 import {Title} from '@material-ui/icons';
+import {post, get} from 'axios';
 
 const useStyles = makeStyles(theme => ({
     appBar: {
@@ -76,25 +77,59 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 export default function CreateCardCategoryDialog(props) {
     const classes = useStyles();
     const [backFields, setBackFields] = useState([]);
-    const [cardTitle, setCardTitle] = useState('');
+    const [cardName, setCardName] = useState('');
 
     const handleClose = () => {
         props.handleCreateCardCategoryDialog(false);
     };
-
-    const handleSave = () => {};
 
     const deleteCol = colId => {
         backFields.splice(colId, 1);
         setBackFields([...backFields]);
     };
 
-    const writeName = e => {
+    const writeCol = e => {
+        e.preventDefault();
         let id = e.target.id;
         console.log(id);
         id = Number(id.split('t-')[1]);
         backFields[id] = e.target.value;
         setBackFields([...backFields]);
+    };
+    useEffect(() => {
+        const strLength = cardName ? cardName.length : 0;
+        if (strLength > 0) {
+            let url = `/api/cards/checkDuplicateCardName`;
+            const userId = sessionStorage.getItem('primaryKey');
+            url += `/?userId=${userId}&`;
+            url += `cardName=${cardName}`;
+
+            get(url)
+                .then(res => {
+                    if (res.data !== null && res.data !== undefined && res.data.length > 0) {
+                        alert('中腹のカードネームです。');
+                    }
+                })
+                .catch(err => {
+                    console.log(err);
+                });
+        }
+    }, [cardName]);
+
+    const handleSave = () => {
+        const url = '/api/cards/create-card-category';
+        const data = {
+            userId: sessionStorage.getItem('primaryKey'),
+            cardName: cardName,
+            backFields: backFields,
+        };
+        const config = {
+            headers: {
+                'content-type': 'application/json',
+            },
+        };
+
+        post(url, data, config).then(res => {});
     };
 
     const getOneItem = (colName = '', colId) => {
@@ -107,7 +142,7 @@ export default function CreateCardCategoryDialog(props) {
                         </Avatar>
                     </ListItemAvatar>
                     <ListItem>
-                        <TextField value={colName} placeholder={`Col${colId}`} id={`t-${colId}`} onChange={writeName} />
+                        <TextField value={colName} placeholder={`Col${colId}`} id={`t-${colId}`} onChange={writeCol} />
                     </ListItem>
                     <ListItemSecondaryAction id={`b-${colId}`}>
                         <IconButton
@@ -130,8 +165,9 @@ export default function CreateCardCategoryDialog(props) {
         setBackFields([...backFields]);
     };
 
-    const writeTitle = e => {
-        setCardTitle(e.target.value);
+    const writeName = e => {
+        e.preventDefault();
+        setCardName(e.target.value);
     };
 
     return (
@@ -166,7 +202,7 @@ export default function CreateCardCategoryDialog(props) {
                                     </Avatar>
                                 </ListItemAvatar>
                                 <ListItem>
-                                    <TextField placeholder='Card Title' onChange={writeTitle} />
+                                    <TextField value={cardName} placeholder='Card Name' onChange={writeName} />
                                 </ListItem>
                             </ListItem>
                             {backFields.map((colName, index) => {

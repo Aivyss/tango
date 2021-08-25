@@ -43,7 +43,7 @@ export default function CreateDeckDialog(props) {
         const isValid = !checkValidation(name) ? false : true;
 
         if (isValid && isValidDeck) {
-            const url = '/api/create-deck';
+            const url = '/api/decks/create-deck';
             const config = {
                 headers: {
                     'content-type': 'application/json',
@@ -72,7 +72,7 @@ export default function CreateDeckDialog(props) {
     };
 
     const checkDuplicatedName = function (name, setIsValidDeck) {
-        const url = '/api/checkDuplicated-deck-name?name=' + name;
+        const url = '/api/decks/checkDuplicated-deck-name?name=' + name;
 
         get(url)
             .then(res => {

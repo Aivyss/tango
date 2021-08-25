@@ -84,7 +84,7 @@ export default function VirtualizedList(props) {
     const classes = useStyles();
     const callDecksFromApi = param => {
         const id = param;
-        const url = '/api/callAllDecks?id=' + id;
+        const url = '/api/decks/callAllDecks?id=' + id;
 
         return get(url)
             .then(res => {

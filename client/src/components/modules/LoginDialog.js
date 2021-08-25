@@ -31,7 +31,7 @@ export default function LoginDialog(props) {
 
     const doLoginProcess = () => {
         if (id.length > 0 && pw.length > 0) {
-            const url = '/api/login';
+            const url = '/api/users/login';
 
             const data = {
                 STRING_ID: id,

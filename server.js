@@ -1,139 +1,23 @@
-// express 및 포트
+// 외부접근
+//const cors = require('cors');
+
+// express 객체
 const express = require('express'); // express js
 const app = express();
-const port = process.env.PORT || 5000;
 
-// database
-const fs = require('fs'); // 파일 읽기 객체
-const data = fs.readFileSync('./database.json');
-const conf = JSON.parse(data);
-const mysql = require('mysql'); // mysql
-const connection = mysql.createConnection({
-    host: conf.host,
-    user: conf.user,
-    password: conf.password,
-    port: conf.port,
-    database: conf.database,
-});
-connection.connect();
-
-// 파일전송 객체
+// 파일전송
 const multer = require('multer'); // 파일 업로드 객체
-const upload = multer({dest: './upload'});
+const upload = multer({dest: './upload'}); // 업로드 위치
 app.use('/images', express.static('./upload')); // /images url을 ./upload로 매핑
 
-// 서버 설정
+// 데이터유형과 인코딩 및 디코딩
 app.use(express.json());
-app.use(express.urlencoded({extended: false}));
+app.use(express.urlencoded({extended: true}));
 
-// 로그인 요청
-app.post('/api/login', (req, res) => {
-    console.log('USER_ID: ', req.body.STRING_ID);
-    console.log('req.body= ', req.body);
-    const sql = `SELECT 
-                    * 
-                FROM 
-                    USER_TABLE
-                WHERE
-                    STRING_ID = ?`;
-    const params = [req.body.STRING_ID];
+// 라우팅
+const route = require('./routes/index');
+app.use('/api', route);
 
-    connection.query(sql, params, (err, rows, fields) => {
-        console.log(rows);
-        res.send(rows);
-    });
-});
-
-// 회원가입 요청
-app.post('/api/signup', (req, res) => {
-    const sql = `INSERT INTO USER_TABLE (
-        STRING_ID
-        ,PASSWORD
-    ) VALUES (
-        ?
-        ,?
-    )`;
-    const params = [];
-    params.push(req.body.STRING_ID);
-    params.push(req.body.PASSWORD);
-
-    connection.query(sql, params, (err, rows, fields) => {
-        res.send(rows);
-    });
-});
-
-// 아이디 중복조회 요청
-app.get('/api/checkDuplicated-id', (req, res) => {
-    console.log('아이디 중복조회 요청');
-    const sql = `SELECT ID FROM USER_TABLE WHERE STRING_ID = ?`;
-    const params = [req.query.id];
-    console.log('id= ', req.query.id);
-
-    connection.query(sql, params, (err, rows, field) => {
-        res.send(rows);
-        console.log(err);
-    });
-});
-
-app.get('/api/callAllDecks', (req, res) => {
-    const params = [req.query.id];
-    const sql = `SELECT * FROM DECK_TABLE WHERE USER_ID = ?`;
-    console.log('전체덱 호출 id=', req.query.id);
-
-    connection.query(sql, params, (err, rows, field) => {
-        console.log('덱리스트: ', JSON.parse(JSON.stringify(rows)));
-        res.send(JSON.parse(JSON.stringify(rows)));
-    });
-});
-
-app.get('/api/checkDuplicated-deck-name', (req, res) => {
-    const params = [req.query.name];
-    const sql = `SELECT * FROM DECK_TABLE WHERE DECK_NAME = ?`;
-    console.log('덱 이름 중복 확인=', req.query.name);
-
-    connection.query(sql, params, (err, rows, field) => {
-        res.send(rows);
-    });
-});
-
-app.post('/api/create-deck', (req, res) => {
-    const params = [req.body.deckName, req.body.userId];
-    const sql = `INSERT INTO DECK_TABLE (DECK_NAME, USER_ID) VALUES (?, ?)`;
-    console.log('덱이름 =', params);
-
-    connection.query(sql, params, (err, rows, field) => {
-        res.send(rows);
-    });
-});
-
-// 덱 정보 요청
-app.get('/api/get-deck-info', (req, res) => {
-    const params = [req.query.deckId];
-    console.log('DeckId = ', params);
-
-    // 테스트단
-    res.send({newCard: 25, reviewCard: 10});
-});
-
-app.get('/api/get-kind-of-card/', (req, res) => {
-    const params = [req.query.userId];
-    const sql = `SELECT * FROM KIND_OF_CARD_TABLE WHERE USER_ID = ?`;
-
-    // 테스트부
-    const rows = [
-        {KIND_ID: 1, CARD_NAME: '베이직카드1', USER_ID: 8},
-        {KIND_ID: 2, CARD_NAME: '베이직카드2', USER_ID: 8},
-        {KIND_ID: 3, CARD_NAME: '베이직카드3', USER_ID: 8},
-        {KIND_ID: 4, CARD_NAME: '베이직카드4', USER_ID: 8},
-    ];
-
-    res.send(rows);
-
-    /*
-    connection.query(sql, params, (err, rows, fields) => {
-        res.send(JSON.parser(JSON.stringify(rows)));
-    });
-    */
-});
-
+// 포트 수신
+const port = process.env.PORT || 5001;
 app.listen(port, () => console.log('Listening on port = ', port));
