@@ -96,4 +96,77 @@ router.get('/call-card-cols', (req, res) => {
     });
 });
 
+// 프론트 컬럼 중복조회
+router.get('/check-duplicate-front', (req, res) => {
+    const {cardId, deckId, str} = req.query;
+    const sql = 'select * from CARD_FRONT_TABLE where KIND_ID = ? and DECK_ID = ? and FRONT_DATA =?';
+
+    conn.query(sql, [Number(cardId), Number(deckId), str], (err, rows, fields) => {
+        if (err) {
+            console.log(err);
+            throw err;
+        } else {
+            res.send(rows.length <= 0);
+        }
+    });
+});
+
+// 카드 생성
+router.post('/create-card', (req, res) => {
+    const {deckId, cardId, front, colsValues} = req.body;
+
+    conn.beginTransaction(err => {
+        if (err) {
+            console.log(err);
+            throw err;
+        } else {
+            // 프론트 인서트문
+            const sqlOne = `insert into CARD_FRONT_TABLE (
+                FRONT_DATA
+                ,DECK_ID
+                ,KIND_ID
+            ) values(
+                ?, ? ,?
+            )`;
+            conn.query(sqlOne, [front, deckId, cardId], frontErr => {
+                if (frontErr) throw frontErr;
+
+                const sqlTwo = `select LAST_INSERT_ID()`;
+                conn.query(sqlTwo, (keySelectErr, row) => {
+                    if (keySelectErr) throw keySelectErr;
+
+                    const sqlThree = `insert into CARD_BACK_TABLE (
+                        FRONT_ID
+                        ,CARD_COL_ID
+                        ,BACK_DATA
+                    ) values (
+                        ?, ?, ?
+                    )`;
+                    const frontKey = row;
+
+                    // 이건 뭐라 안하네
+                    Object.keys(colsValues).map(prop => {
+                        conn.query(sqlThree, [frontKey, Number(prop), colsValues[prop]], backErr => {
+                            if (backErr) throw backErr;
+                        });
+
+                        return true;
+                    });
+
+                    // ESLint error
+                    // for (const prop in colsValues) {
+                    //     if (colsValues.hasOwnPropety.call(colsValues, prop)) {
+                    //         conn.query(sqlThree, [frontKey, Number(prop), colsValues[prop]], backErr => {
+                    //             if (backErr) throw backErr;
+                    //         });
+                    //     }
+                    // }
+
+                    conn.commit();
+                });
+            });
+        }
+    });
+});
+
 module.exports = router;

@@ -11,7 +11,7 @@ import Slide from '@material-ui/core/Slide';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import Select from '@material-ui/core/Select';
-import {AddBox} from '@material-ui/icons';
+import {AddBox, SettingsOutlined} from '@material-ui/icons';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
@@ -70,8 +70,8 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 export default function CreateCardDialog(props) {
     const classes = useStyles();
     const cardList = props.cardCategories;
-    const colsList = props.targetCardsCols;
     const [colsValues, setColsValues] = useState({});
+    const [front, setFront] = useState('');
     const [error, setError] = useState(false);
 
     const handleChangeDeck = event => {
@@ -97,8 +97,11 @@ export default function CreateCardDialog(props) {
             })
             .catch(err => console.log(err))
             .then(data => {
+                console.log('🚀 ~ file: CreateCardDialog.js ~ line 100 ~ CreateCardDialog ~ data', data);
                 props.setTargetCard(cardId);
                 setColsValues(data);
+                setError(false);
+                setFront('');
             });
     };
 
@@ -129,9 +132,32 @@ export default function CreateCardDialog(props) {
     };
 
     const writeCol = e => {
+        const str = e.target.value;
         const id = e.target.id; // colId
-        colsValues[id] = e.target.value;
-        setColsValues(colsValues);
+
+        colsValues[id] = str;
+        console.log('🚀 ~ file: CreateCardDialog.js ~ line 138 ~ CreateCardDialog ~ colsValues', colsValues);
+        setColsValues({...colsValues});
+    };
+
+    const writeFront = e => {
+        const str = e.target.value;
+        console.log('🚀 ~ file: CreateCardDialog.js ~ line 145 ~ CreateCardDialog ~ str', str);
+
+        if (str) {
+            const cardId = props.targetCardId;
+            const deckId = props.deckId;
+            const url = `/api/cards/check-duplicate-front?cardId=${cardId}&deckId=${deckId}&str=${str}`;
+
+            get(url)
+                .then(res => {
+                    const bool = res.data;
+
+                    if (!bool) setError(!bool);
+                })
+                .catch(err => console.log(err));
+        }
+        setFront(str);
     };
 
     useEffect(() => {
@@ -146,7 +172,28 @@ export default function CreateCardDialog(props) {
             .catch(err => console.log(err));
     }, []);
 
-    const handleSave = () => {};
+    const handleSave = () => {
+        if (front && !error) {
+            const url = '/api/cards/create-card';
+            const config = {
+                headers: {
+                    'content-type': 'application/json',
+                },
+            };
+            const data = {
+                deckId: props.deckId,
+                cardId: props.targetCardId,
+                front: front,
+                colsValues: colsValues,
+            };
+
+            post(url, data, config)
+                .then(res => {
+                    console.log(res.data);
+                })
+                .catch(err => console.log(err));
+        }
+    };
 
     return (
         <div>
@@ -164,83 +211,78 @@ export default function CreateCardDialog(props) {
                         <Typography variant='h6' className={classes.title}>
                             新しいカードを作成し、デックに入れます。
                         </Typography>
-                        <decks>
-                            <FormControl variant='filled' className={classes.formControl}>
-                                <InputLabel htmlFor='decks'>decks</InputLabel>
-                                <Select
-                                    native
-                                    value={props.deckId}
-                                    onChange={handleChangeDeck}
-                                    inputProps={{
-                                        name: 'decks',
-                                        id: 'dekcs',
-                                        value: props.deckId,
-                                    }}
-                                >
-                                    <option aria-label='None' value='' />
-                                    {props.deckList.map(curr => {
-                                        return (
-                                            <option key={curr.DECK_ID} value={curr.DECK_ID}>
-                                                {curr.DECK_NAME}
-                                            </option>
-                                        );
-                                    })}
-                                </Select>
-                            </FormControl>
-                        </decks>
+                        <FormControl variant='filled' className={classes.formControl}>
+                            <InputLabel htmlFor='decks'>decks</InputLabel>
+                            <Select
+                                native
+                                value={props.deckId}
+                                onChange={handleChangeDeck}
+                                inputProps={{
+                                    name: 'decks',
+                                    id: 'dekcs',
+                                    value: props.deckId,
+                                }}
+                            >
+                                <option aria-label='None' value='' />
+                                {props.deckList.map(curr => {
+                                    return (
+                                        <option key={curr.DECK_ID} value={curr.DECK_ID}>
+                                            {curr.DECK_NAME}
+                                        </option>
+                                    );
+                                })}
+                            </Select>
+                        </FormControl>
 
-                        <cards>
-                            <FormControl variant='filled' className={classes.formControl}>
-                                <InputLabel htmlFor='cards'>cards</InputLabel>
-                                <Select
-                                    native
-                                    onChange={handleChangeCard}
-                                    inputProps={{
-                                        name: 'cards',
-                                        id: 'cards',
-                                        value: props.targetCardId,
-                                    }}
-                                >
-                                    <option aria-label='None' value='' />
-                                    {cardList.map(curr => {
-                                        return (
-                                            <option key={curr.KIND_ID} value={curr.KIND_ID}>
-                                                {curr.CARD_NAME}
-                                            </option>
-                                        );
-                                    })}
-                                </Select>
-                            </FormControl>
-                        </cards>
+                        <FormControl variant='filled' className={classes.formControl}>
+                            <InputLabel htmlFor='cards'>cards</InputLabel>
+                            <Select
+                                native
+                                onChange={handleChangeCard}
+                                inputProps={{
+                                    name: 'cards',
+                                    id: 'cards',
+                                    value: props.targetCardId,
+                                }}
+                            >
+                                <option aria-label='None' value='' />
+                                {cardList.map(curr => {
+                                    return (
+                                        <option key={curr.KIND_ID} value={curr.KIND_ID}>
+                                            {curr.CARD_NAME}
+                                        </option>
+                                    );
+                                })}
+                            </Select>
+                        </FormControl>
 
                         <Button autoFocus color='inherit' onClick={handleSave}>
                             save
                         </Button>
                     </Toolbar>
                 </AppBar>
-                <colms>
-                    <Container maxWidth='sm'>
-                        <div className={classes.demo}>
-                            <List>
+
+                <Container maxWidth='sm'>
+                    <div className={classes.demo}>
+                        <List>
+                            <ListItem>
+                                <ListItemAvatar>
+                                    <Avatar>
+                                        <Title />
+                                    </Avatar>
+                                </ListItemAvatar>
                                 <ListItem>
-                                    <ListItemAvatar>
-                                        <Avatar>
-                                            <Title />
-                                        </Avatar>
-                                    </ListItemAvatar>
-                                    <ListItem>
-                                        <TextField error={error} placeholder='Front' />
-                                    </ListItem>
+                                    <TextField error={error} placeholder='Front' onChange={writeFront} value={front} />
                                 </ListItem>
-                                {props.targetCardsCols
-                                    ? props.targetCardsCols.map(curr => {
-                                          return getOneItem(curr.COL_NAME, curr.CARD_COL_ID);
-                                      })
-                                    : ''}
-                            </List>
-                        </div>
-                    </Container>
-                </colms>
+                            </ListItem>
+                            {props.targetCardsCols
+                                ? props.targetCardsCols.map(curr => {
+                                      return getOneItem(curr.COL_NAME, curr.CARD_COL_ID);
+                                  })
+                                : ''}
+                        </List>
+                    </div>
+                </Container>
             </Dialog>
         </div>
     );

@@ -99,7 +99,7 @@ export default function TopBar(props) {
             })
             .catch(err => console.log(err))
             .then(() => {
-                const url = '/api/decks/call-all-card-categories?userId=' + id;
+                const url = '/api/cards/call-all-card-categories?userId=' + id;
                 get(url)
                     .then(res => {
                         const data = res.data;
