@@ -134,9 +134,10 @@ export default function CreateCardCategoryDialog(props) {
                     return arr;
                 }
             };
-            console.log(removeNulls(backFields));
+            const userId = sessionStorage.getItem('primaryKey');
+            removeNulls(backFields);
             const data = {
-                userId: sessionStorage.getItem('primaryKey'),
+                userId: userId,
                 cardName: cardName,
                 backFields: backFields,
             };
@@ -146,7 +147,22 @@ export default function CreateCardCategoryDialog(props) {
                 },
             };
 
-            post(url, data, config).then(res => {});
+            post(url, data, config)
+                .then(res => {
+                    if (res.data) {
+                        console.log('카드유형생성성공');
+                        setCardName('');
+                        setBackFields([]);
+                        setError(false);
+
+                        const url = '/api/cards/callAllCardCategories?id=' + userId;
+                        get(url).then(res => {
+                            const data = res.data;
+                            props.setAllCardCategories(data);
+                        });
+                    }
+                })
+                .catch(err => console.log(err));
         }
     };
 

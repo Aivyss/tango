@@ -15,6 +15,12 @@ function mapDispatchToProps(dispatch) {
                 createCardCategoryDialogIsOpen: bools,
             });
         },
+        setAllCardCategories: data => {
+            dispatch({
+                type: 'SET_ALL_CARD_CATEGORIES',
+                cardCategories: data,
+            });
+        },
     };
 }
 

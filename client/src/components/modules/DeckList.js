@@ -7,7 +7,7 @@ import {FixedSizeList} from 'react-window';
 import {useHistory} from 'react-router';
 import {makeStyles} from '@material-ui/core/styles';
 import {Box} from '@material-ui/core';
-import {get, post} from 'axios';
+import {get} from 'axios';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -97,11 +97,20 @@ export default function VirtualizedList(props) {
                 console.log('failed deck loading');
             });
     };
+    const callCardCategoryFromApi = id => {
+        const url = '/api/cards/callAllCardCategories?id=' + id;
+
+        get(url).then(res => {
+            const data = res.data;
+            props.setAllCardCategories(data);
+        });
+    };
 
     useEffect(() => {
-        console.log('useEffect 덱콜');
+        console.log('useEffect 덱콜 카드콜');
         const id = sessionStorage.getItem('primaryKey');
         callDecksFromApi(id);
+        callCardCategoryFromApi(id);
     }, []);
 
     return (

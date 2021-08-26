@@ -5,6 +5,7 @@ import {get} from 'axios';
 function mapStateToProps(state) {
     return {
         deckList: state.deckReducer.deckList,
+        cardCategories: state.cardReducer.cardCategories,
     };
 }
 
@@ -44,6 +45,12 @@ function mapDispatchToPros(dispatch) {
                 type: 'SET_TARGET_DECK',
                 targetDeckName: deckName,
                 deckId: deckId,
+            });
+        },
+        setAllCardCategories: cardList => {
+            dispatch({
+                type: 'SET_ALL_CARD_CATEGORIES',
+                cardCategories: cardList,
             });
         },
     };

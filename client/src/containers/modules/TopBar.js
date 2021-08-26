@@ -52,6 +52,18 @@ function mapDispatchToProps(dispatch) {
                 createCardCategoryDialogIsOpen: bools,
             });
         },
+        setAllDeck: deckList => {
+            dispatch({
+                type: 'SET_ALL_DECK',
+                deckList: deckList,
+            });
+        },
+        setAllCardCategories: cardList => {
+            dispatch({
+                type: 'SET_ALL_CARD_CATEGORIES',
+                cardCategories: cardList,
+            });
+        },
     };
 }
 

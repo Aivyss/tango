@@ -15,6 +15,7 @@ import ViewCarousel from '@material-ui/icons/ViewCarousel';
 import MeetingRoom from '@material-ui/icons/MeetingRoom';
 import {useHistory} from 'react-router-dom';
 import {DnsSharp} from '@material-ui/icons';
+import {get} from 'axios';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -88,7 +89,26 @@ export default function TopBar(props) {
     };
 
     const openCreateCardDialog = () => {
-        props.openCreateCardDialog();
+        const id = sessionStorage.getItem('primaryKey');
+        const url = '/api/decks/callAllDecks/?id=' + id;
+        get(url)
+            .then(res => {
+                console.log('작동첵2');
+                const data = res.data;
+                props.setAllDeck(data);
+            })
+            .catch(err => console.log(err))
+            .then(() => {
+                const url = '/api/decks/call-all-card-categories?userId=' + id;
+                get(url)
+                    .then(res => {
+                        const data = res.data;
+                        props.setAllCardCategories(data);
+                        props.openCreateCardDialog();
+                    })
+                    .catch(err => console.log(err))
+                    .then(props.openCreateCardDialog);
+            });
     };
 
     const doLogout = () => {

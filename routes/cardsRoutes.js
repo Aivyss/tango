@@ -53,12 +53,46 @@ router.post('/create-card-category', (req, res) => {
                                 });
                             }
 
-                            if (index === paramTwo.length - 1) conn.commit();
+                            if (index === paramTwo.length - 1) {
+                                conn.commit();
+                                res.send(true);
+                            }
                         }),
                     );
                 }
             });
         });
+    });
+});
+
+// 카드 카테고리 전체조회
+router.get('/call-all-card-categories', (req, res) => {
+    const {userId} = req.query;
+    const sql = `SELECT * FROM KIND_OF_CARD_TABLE WHERE USER_ID = ?`;
+    conn.query(sql, [Number(userId)], (err, rows, fields) => {
+        if (err) {
+            console.log(err);
+            throw err;
+        } else {
+            res.send(JSON.parse(JSON.stringify(rows)));
+        }
+    });
+});
+
+// 카드 컬럼 조회
+router.get('/call-card-cols', (req, res) => {
+    const {cardId} = req.query;
+    console.log('🚀 ~ file: cardsRoutes.js ~ line 85 ~ router.get ~ cardId', cardId);
+    const sql = 'SELECT * FROM CARD_COL_TABLE WHERE KIND_ID = ?';
+
+    conn.query(sql, [cardId], (err, rows, fields) => {
+        console.log('🚀 ~ file: cardsRoutes.js ~ line 89 ~ conn.query ~ rows', rows);
+        if (err) {
+            console.log('🚀 ~ file: cardsRoutes.js ~ line 89 ~ conn.query ~ err', err);
+            throw err;
+        } else {
+            res.send(JSON.parse(JSON.stringify(rows)));
+        }
     });
 });
 

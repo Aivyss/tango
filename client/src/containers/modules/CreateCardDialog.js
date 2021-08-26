@@ -7,7 +7,9 @@ function mapStateToProps(state) {
         createCardDialogIsOpen: state.dialogReducer.createCardDialogIsOpen,
         deckList: state.deckReducer.deckList,
         deckId: state.deckReducer.deckId,
-        targetDeckName: state.deckReducer.targetDeckName,
+        cardCategories: state.cardReducer.cardCategories,
+        targetCardId: state.cardReducer.targetCardId,
+        targetCardsCols: state.cardReducer.targetCardsCols,
     };
 }
 
@@ -23,7 +25,24 @@ function mapDispatchToProps(dispatch) {
             dispatch({
                 type: 'SET_TARGET_DECK',
                 deckId: deckId,
-                targetDeckName: deckName,
+            });
+        },
+        setAllCardCategories: cardList => {
+            dispatch({
+                type: 'SET_ALL_CARD_CATEGORIES',
+                cardCategories: cardList,
+            });
+        },
+        setTargetCard: (cardId, cardName) => {
+            dispatch({
+                type: 'SET_TARGET_CARD',
+                targetCardId: cardId,
+            });
+        },
+        setTargetCardsCols: data => {
+            dispatch({
+                type: 'SET_TARGET_CARDS_COLS',
+                targetCardsCols: data,
             });
         },
     };
