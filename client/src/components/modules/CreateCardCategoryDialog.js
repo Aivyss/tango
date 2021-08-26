@@ -78,6 +78,7 @@ export default function CreateCardCategoryDialog(props) {
     const classes = useStyles();
     const [backFields, setBackFields] = useState([]);
     const [cardName, setCardName] = useState('');
+    const [error, setError] = useState(false);
 
     const handleClose = () => {
         props.handleCreateCardCategoryDialog(false);
@@ -108,6 +109,9 @@ export default function CreateCardCategoryDialog(props) {
                 .then(res => {
                     if (res.data !== null && res.data !== undefined && res.data.length > 0) {
                         alert('中腹のカードネームです。');
+                        setError(true);
+                    } else {
+                        setError(false);
                     }
                 })
                 .catch(err => {
@@ -117,19 +121,33 @@ export default function CreateCardCategoryDialog(props) {
     }, [cardName]);
 
     const handleSave = () => {
-        const url = '/api/cards/create-card-category';
-        const data = {
-            userId: sessionStorage.getItem('primaryKey'),
-            cardName: cardName,
-            backFields: backFields,
-        };
-        const config = {
-            headers: {
-                'content-type': 'application/json',
-            },
-        };
+        if (!error) {
+            const url = '/api/cards/create-card-category';
+            console.log(typeof backFields);
+            console.log(backFields);
+            const removeNulls = arr => {
+                const idx = arr.indexOf(null);
+                if (idx !== -1) {
+                    arr.splice(idx, 1);
+                    removeNulls(arr);
+                } else {
+                    return arr;
+                }
+            };
+            console.log(removeNulls(backFields));
+            const data = {
+                userId: sessionStorage.getItem('primaryKey'),
+                cardName: cardName,
+                backFields: backFields,
+            };
+            const config = {
+                headers: {
+                    'content-type': 'application/json',
+                },
+            };
 
-        post(url, data, config).then(res => {});
+            post(url, data, config).then(res => {});
+        }
     };
 
     const getOneItem = (colName = '', colId) => {
@@ -202,7 +220,12 @@ export default function CreateCardCategoryDialog(props) {
                                     </Avatar>
                                 </ListItemAvatar>
                                 <ListItem>
-                                    <TextField value={cardName} placeholder='Card Name' onChange={writeName} />
+                                    <TextField
+                                        error={error}
+                                        value={cardName}
+                                        placeholder='Card Name'
+                                        onChange={writeName}
+                                    />
                                 </ListItem>
                             </ListItem>
                             {backFields.map((colName, index) => {
