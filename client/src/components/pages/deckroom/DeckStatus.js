@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import {Fragment, useState, useEffect} from 'react';
 import {Grid} from '@material-ui/core';
 import {Button} from '@material-ui/core';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -65,7 +65,7 @@ export default function DeckStatus(props) {
                         </div>
                     </Grid>
                     <Grid item xs={12}>
-                        <React.Fragment>
+                        <Fragment>
                             <CssBaseline />
                             <Container maxWidth='sm'>
                                 <div style={buttonWrapperStyles}>
@@ -81,7 +81,7 @@ export default function DeckStatus(props) {
                                     </div>
                                 </div>
                             </Container>
-                        </React.Fragment>
+                        </Fragment>
                     </Grid>
                 </Grid>
                 <CreateCardDialog open={openCreateCardModal} deckId={deckId} setOpen={modalClose} />

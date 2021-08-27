@@ -5,20 +5,19 @@ import {BrowserRouter, Route} from 'react-router-dom';
 import Home from './containers/pages/Home/Home';
 import HomeTwo from './components/pages/Home/HomeTwo';
 
-import theme from './theme/theme';
-
 function App(props) {
     const userId = sessionStorage.getItem('primaryKey');
 
     useEffect(() => {
-        userId ? props.handleLoginDialog(false) : props.handleLoginDialog(true);
+        console.log(userId);
+        props.handleLoginDialog(!userId && true);
     }, [userId]);
 
     return (
         <div className='App'>
             <BrowserRouter>
-                {sessionStorage.getItem('primaryKey') ? (
-                    <Route path='/' component={() => <Home />} />
+                {userId ? (
+                    <Route path='/' component={Home} />
                 ) : (
                     <div>
                         <HomeTwo />

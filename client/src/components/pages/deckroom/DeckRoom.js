@@ -1,4 +1,3 @@
-import React from 'react';
 import TangoCard from '../../modules/TangoCard';
 import {Route, Switch} from 'react-router';
 import DeckStatus from '../../../containers/pages/deckroom/DeckStatus';

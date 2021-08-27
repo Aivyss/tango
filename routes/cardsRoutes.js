@@ -118,6 +118,7 @@ router.post('/create-card', (req, res) => {
     conn.beginTransaction(err => {
         if (err) {
             console.log(err);
+            res.send(false);
             throw err;
         } else {
             // 프론트 인서트문
@@ -142,7 +143,8 @@ router.post('/create-card', (req, res) => {
                     ) values (
                         ?, ?, ?
                     )`;
-                    const frontKey = row;
+                    const frontKey = JSON.parse(JSON.stringify(row))[0]['LAST_INSERT_ID()'];
+                    console.log('🚀 ~ file: cardsRoutes.js ~ line 146 ~ conn.query ~ frontKey', frontKey);
 
                     // 이건 뭐라 안하네
                     Object.keys(colsValues).map(prop => {
@@ -152,17 +154,8 @@ router.post('/create-card', (req, res) => {
 
                         return true;
                     });
-
-                    // ESLint error
-                    // for (const prop in colsValues) {
-                    //     if (colsValues.hasOwnPropety.call(colsValues, prop)) {
-                    //         conn.query(sqlThree, [frontKey, Number(prop), colsValues[prop]], backErr => {
-                    //             if (backErr) throw backErr;
-                    //         });
-                    //     }
-                    // }
-
                     conn.commit();
+                    res.send(true);
                 });
             });
         }
