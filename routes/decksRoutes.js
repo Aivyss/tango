@@ -1,5 +1,7 @@
+const {json} = require('body-parser');
 const express = require('express');
 const router = express.Router();
+const connection = require('mysql2/promise');
 const conn = require('../database');
 
 // 전체덱 조회
@@ -43,6 +45,59 @@ router.get('/get-deck-info', (req, res) => {
 
     // 테스트단
     res.send({newCard: 25, reviewCard: 10});
+});
+
+router.get('/call-study-card', (req, res) => {
+    conn.beginTransaction(err => {
+        if (err) {
+            console.log(err);
+            throw err;
+        }
+
+        const sqlOne = `select 
+            * 
+        from 
+            CARD_FRONT_TABLE
+        where 
+            DECK_ID = ?
+            AND
+            DUE_DATE <= NOW()
+        order by
+            RAND()`;
+        conn.query(sqlOne, [Number(req.query.deckId)], (frontErr, rows) => {
+            if (frontErr) {
+                throw frontErr;
+            } else {
+                // [{FRONT_ID, FRONT_DATA, KIND_ID, DUE_DATE, E_FACTOR, DECK_ID}, {}....]
+                const sqlTwo = `select 
+                    * 
+                from 
+                    CARD_BACK_TABLE
+                where
+                    FRONT_ID = ?
+                `;
+
+                /* eslint no-param-reassign: ["error", { "props": true, "ignorePropertyModificationsFor": ["curr"] }] */
+                const data = JSON.parse(JSON.stringify(rows));
+                const backList = [];
+                new Promise((resolve, reject) => {
+                    data.map(curr => {
+                        conn.query(sqlTwo, curr.FRONT_ID, (backErr, backRows) => {
+                            if (backErr) throw backErr;
+
+                            resolve(backRows);
+                        });
+
+                        return curr;
+                    });
+                }).then(backs => {
+                    console.log('🚀 ~ file: decksRoutes.js ~ line 94 ~ newPromise ~ backs', backs);
+                    backList.push(backs);
+                });
+                res.send(data);
+            }
+        });
+    });
 });
 
 module.exports = router;

@@ -144,12 +144,10 @@ export default function CreateCardDialog(props) {
 
             get(url)
                 .then(res => {
-                    const bool = res.data;
+                    const bool = res.data; // duplicate-> true
 
-                    if (!bool) {
-                        setError(!bool);
-                        setDuplicated(true);
-                    }
+                    setError(bool);
+                    setDuplicated(bool);
                 })
                 .catch(err => console.log(err));
         }
@@ -204,6 +202,7 @@ export default function CreateCardDialog(props) {
                         setError(false);
                         setSuccess({display: ''});
                         for (const prop in Object.entries(colsValues)) {
+                            console.log('🚀 ~ file: CreateCardDialog.js ~ line 205 ~ handleSave ~ prop', prop);
                             colsValues[prop] = '';
                         }
                         setColsValues({...colsValues});

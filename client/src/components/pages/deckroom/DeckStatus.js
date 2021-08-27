@@ -50,7 +50,10 @@ export default function DeckStatus(props) {
         const url = `/api/decks/call-study-card?deckId=${deckId}`;
 
         get(url)
-            .then(res => {})
+            .then(res => {
+                const data = res.data;
+                console.log('🚀 ~ file: DeckStatus.js ~ line 55 ~ clickStart ~ data', data);
+            })
             .catch(err => console.log(err));
     };
 
