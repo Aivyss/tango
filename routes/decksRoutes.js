@@ -1,9 +1,9 @@
+/* eslint no-param-reassign: ["error", { "props": true, "ignorePropertyModificationsFor": ["curr"] }] */
 const {json} = require('body-parser');
 const express = require('express');
 const router = express.Router();
-const connection = require('mysql2/promise');
 const conn = require('../database');
-
+const pool = require('../database2');
 // 전체덱 조회
 router.get('/callAllDecks', (req, res) => {
     const params = [req.query.id];
@@ -47,57 +47,49 @@ router.get('/get-deck-info', (req, res) => {
     res.send({newCard: 25, reviewCard: 10});
 });
 
+// 공부할 카드 호출
 router.get('/call-study-card', (req, res) => {
-    conn.beginTransaction(err => {
-        if (err) {
-            console.log(err);
-            throw err;
+    (async () => {
+        const connection = await pool.getConnection(async conn2 => conn2);
+
+        try {
+            const deckId = Number(req.query.deckId);
+            const sqlOne = `select
+                *
+            from
+                CARD_FRONT_TABLE
+            where
+                DECK_ID = ?
+                AND
+                DUE_DATE <= NOW()
+            order by
+                RAND()
+            `;
+            const sqlTwo = `select
+                *
+            from
+                CARD_BACK_TABLE
+            where
+                FRONT_ID = ?
+            `;
+            let [rows] = await connection.query(sqlOne, [deckId]);
+            rows = JSON.parse(JSON.stringify(rows));
+
+            await Promise.all(
+                rows.map(async curr => {
+                    const backs = await connection.query(sqlTwo, [curr.FRONT_ID]);
+                    curr.BACK_COLS = JSON.parse(JSON.stringify(backs[0]));
+                }),
+            );
+
+            res.send(rows);
+        } catch (err) {
+            console.log('🚀 ~ file: decksRoutes.js ~ line 56 ~ err', err);
+            res.send([]);
+        } finally {
+            connection.release();
         }
-
-        const sqlOne = `select 
-            * 
-        from 
-            CARD_FRONT_TABLE
-        where 
-            DECK_ID = ?
-            AND
-            DUE_DATE <= NOW()
-        order by
-            RAND()`;
-        conn.query(sqlOne, [Number(req.query.deckId)], (frontErr, rows) => {
-            if (frontErr) {
-                throw frontErr;
-            } else {
-                // [{FRONT_ID, FRONT_DATA, KIND_ID, DUE_DATE, E_FACTOR, DECK_ID}, {}....]
-                const sqlTwo = `select 
-                    * 
-                from 
-                    CARD_BACK_TABLE
-                where
-                    FRONT_ID = ?
-                `;
-
-                /* eslint no-param-reassign: ["error", { "props": true, "ignorePropertyModificationsFor": ["curr"] }] */
-                const data = JSON.parse(JSON.stringify(rows));
-                const backList = [];
-                new Promise((resolve, reject) => {
-                    data.map(curr => {
-                        conn.query(sqlTwo, curr.FRONT_ID, (backErr, backRows) => {
-                            if (backErr) throw backErr;
-
-                            resolve(backRows);
-                        });
-
-                        return curr;
-                    });
-                }).then(backs => {
-                    console.log('🚀 ~ file: decksRoutes.js ~ line 94 ~ newPromise ~ backs', backs);
-                    backList.push(backs);
-                });
-                res.send(data);
-            }
-        });
-    });
+    })();
 });
 
 module.exports = router;
