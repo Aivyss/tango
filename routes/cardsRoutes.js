@@ -38,26 +38,28 @@ router.post('/create-card-category', (req, res) => {
 
             const [rows] = await connection.query('SELECT LAST_INSERT_ID()');
             const kindTablePK = JSON.parse(JSON.stringify(rows))[0]['LAST_INSERT_ID()'];
-            console.log('🚀 ~ file: cardsRoutes.js ~ line 41 ~ kindTablePK', kindTablePK);
 
-            let doCommit = false;
-            for (let i = 0; i < paramTwo.length; i += 1) {
-                connection.query(sqlTwo, [kindTablePK, paramTwo[i]]);
+            const testList = await Promise.all(
+                paramTwo.map(async curr => {
+                    await connection.query(sqlTwo, [kindTablePK, curr]);
 
-                if (i === paramTwo.length - 1) {
-                    doCommit = true;
-                    res.send(true);
-                }
-            }
-            if (doCommit) await connection.commit();
+                    return '됐쪄염';
+                }),
+            );
+            console.log('🚀 ~ file: cardsRoutes.js ~ line 49 ~ testList', testList);
+
+            await connection.commit();
+            res.send(true);
         } catch (err) {
+            console.log(err);
             await connection.rollback();
+            res.send(false);
         } finally {
             connection.release();
         }
     })();
 
-    // !legacy
+    // !deprecated, it makes bug sometimes
     // conn.beginTransaction(err => {
     //     if (err) {
     //         console.log(err);
@@ -161,12 +163,10 @@ router.get('/check-duplicate-front', (req, res) => {
 router.post('/create-card', (req, res) => {
     const {deckId, cardId, front, colsValues} = req.body;
 
-    conn.beginTransaction(err => {
-        if (err) {
-            console.log(err);
-            res.send(false);
-            throw err;
-        } else {
+    (async () => {
+        const connection = await pool.getConnection(async conn2 => conn2);
+
+        try {
             // 프론트 인서트문
             const sqlOne = `insert into CARD_FRONT_TABLE (
                 FRONT_DATA
@@ -175,53 +175,97 @@ router.post('/create-card', (req, res) => {
             ) values(
                 ?, ? ,?
             )`;
-            conn.query(sqlOne, [front, deckId, cardId], frontErr => {
-                if (frontErr) {
-                    return conn.rollback(() => {
-                        res.send(false);
-                        throw frontErr;
-                    });
-                }
-
-                const sqlTwo = `select LAST_INSERT_ID()`;
-                conn.query(sqlTwo, (keySelectErr, row) => {
-                    if (keySelectErr) {
-                        return conn.rollback(() => {
-                            res.send(false);
-                            throw keySelectErr;
-                        });
-                    }
-
-                    const sqlThree = `insert into CARD_BACK_TABLE (
-                        FRONT_ID
-                        ,CARD_COL_ID
-                        ,BACK_DATA
-                    ) values (
-                        ?, ?, ?
-                    )`;
-                    const frontKey = JSON.parse(JSON.stringify(row))[0]['LAST_INSERT_ID()'];
-                    console.log('🚀 ~ file: cardsRoutes.js ~ line 146 ~ conn.query ~ frontKey', frontKey);
-
-                    // 이건 뭐라 안하네
-                    Object.keys(colsValues).map(prop => {
-                        conn.query(sqlThree, [frontKey, Number(prop), colsValues[prop]], backErr => {
-                            if (backErr) throw backErr;
-                        });
-
-                        return true;
-                    });
-                    res.send(true);
-                    conn.commit();
-
-                    return true;
-                });
-
-                return true;
-            });
-
-            return true;
+            // 프라이머리키 셀렉트
+            const sqlTwo = `select LAST_INSERT_ID()`;
+            // 백 인서트문
+            const sqlThree = `insert into CARD_BACK_TABLE (
+                FRONT_ID
+                ,CARD_COL_ID
+                ,BACK_DATA
+            ) values (
+                ?, ?, ?
+            )`;
+            await connection.query(sqlOne, [front, deckId, cardId]);
+            let [rows] = await connection.query(sqlTwo);
+            rows = JSON.parse(JSON.stringify(rows))[0]['LAST_INSERT_ID()'];
+            Promise.all(
+                Object.keys(colsValues).map(async prop => {
+                    await connection.query(sqlThree, [rows, prop, colsValues[prop]]);
+                }),
+            );
+            await connection.commit();
+            res.send(true);
+        } catch (err) {
+            console.log(err);
+            await connection.rollback();
+            res.send(false);
+        } finally {
+            connection.release();
         }
-    });
+    })();
+
+    // !Bugs deprecated
+    // conn.beginTransaction(err => {
+    //     if (err) {
+    //         console.log(err);
+    //         res.send(false);
+    //         throw err;
+    //     } else {
+    //         // 프론트 인서트문
+    //         const sqlOne = `insert into CARD_FRONT_TABLE (
+    //             FRONT_DATA
+    //             ,DECK_ID
+    //             ,KIND_ID
+    //         ) values(
+    //             ?, ? ,?
+    //         )`;
+    //         conn.query(sqlOne, [front, deckId, cardId], frontErr => {
+    //             if (frontErr) {
+    //                 return conn.rollback(() => {
+    //                     res.send(false);
+    //                     throw frontErr;
+    //                 });
+    //             }
+
+    //             const sqlTwo = `select LAST_INSERT_ID()`;
+    //             conn.query(sqlTwo, (keySelectErr, row) => {
+    //                 if (keySelectErr) {
+    //                     return conn.rollback(() => {
+    //                         res.send(false);
+    //                         throw keySelectErr;
+    //                     });
+    //                 }
+
+    //                 const sqlThree = `insert into CARD_BACK_TABLE (
+    //                     FRONT_ID
+    //                     ,CARD_COL_ID
+    //                     ,BACK_DATA
+    //                 ) values (
+    //                     ?, ?, ?
+    //                 )`;
+    //                 const frontKey = JSON.parse(JSON.stringify(row))[0]['LAST_INSERT_ID()'];
+    //                 console.log('🚀 ~ file: cardsRoutes.js ~ line 146 ~ conn.query ~ frontKey', frontKey);
+
+    //                 // 이건 뭐라 안하네
+    //                 Object.keys(colsValues).map(prop => {
+    //                     conn.query(sqlThree, [frontKey, Number(prop), colsValues[prop]], backErr => {
+    //                         if (backErr) throw backErr;
+    //                     });
+
+    //                     return true;
+    //                 });
+    //                 res.send(true);
+    //                 conn.commit();
+
+    //                 return true;
+    //             });
+
+    //             return true;
+    //         });
+
+    //         return true;
+    //     }
+    // });
 });
 
 module.exports = router;
