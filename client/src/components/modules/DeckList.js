@@ -42,16 +42,9 @@ const useStyles = makeStyles(theme => ({
 function RenderRow(props) {
     // props의 구조는 { data, style, index, isScrolling }으로 되어있다.
     const {index, style, data} = props;
-    let [deckList, setDeckList] = useState([]);
-    let [prevProps, setPrevProps] = useState(null);
+    const deckList = data[0];
+    const prevProps = data[1];
     const history = useHistory();
-
-    useEffect(() => {
-        if (deckList.length <= 0) {
-            setDeckList(data[0]);
-            setPrevProps(data[1]);
-        }
-    }, []);
 
     return (
         <ListItem
@@ -81,6 +74,7 @@ RenderRow.propTypes = {
 };
 
 export default function VirtualizedList(props) {
+    const id = localStorage.getItem('primaryKey');
     const classes = useStyles();
     const callDecksFromApi = param => {
         const id = param;
@@ -108,10 +102,10 @@ export default function VirtualizedList(props) {
 
     useEffect(() => {
         console.log('useEffect 덱콜 카드콜');
-        const id = sessionStorage.getItem('primaryKey');
+
         callDecksFromApi(id);
         callCardCategoryFromApi(id);
-    }, []);
+    }, [id]);
 
     return (
         <div className={classes.centerBox}>

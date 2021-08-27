@@ -6,7 +6,9 @@ import Home from './containers/pages/Home/Home';
 import HomeTwo from './components/pages/Home/HomeTwo';
 
 function App(props) {
-    const userId = sessionStorage.getItem('primaryKey');
+    const userId = localStorage.getItem('primaryKey');
+    const isLogined = props.isLogined;
+    console.log('🚀 ~ file: App.js ~ line 11 ~ App ~ isLogined', isLogined);
 
     useEffect(() => {
         console.log(userId);
@@ -16,7 +18,7 @@ function App(props) {
     return (
         <div className='App'>
             <BrowserRouter>
-                {userId ? (
+                {userId && isLogined ? (
                     <Route path='/' component={Home} />
                 ) : (
                     <div>

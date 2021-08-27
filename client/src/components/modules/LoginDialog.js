@@ -47,8 +47,8 @@ export default function LoginDialog(props) {
             post(url, data, config)
                 .then(res => {
                     if (res.data[0].STRING_ID === id && res.data[0].PASSWORD === pw) {
-                        sessionStorage.setItem('id', res.data[0].STRING_ID);
-                        sessionStorage.setItem('primaryKey', res.data[0].ID);
+                        localStorage.setItem('id', res.data[0].STRING_ID);
+                        localStorage.setItem('primaryKey', res.data[0].ID);
                         handleClose(); // 모달 닫기
                         props.doLogin(true); // 리덕스 반영
                     } else {

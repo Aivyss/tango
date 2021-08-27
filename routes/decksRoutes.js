@@ -38,7 +38,7 @@ router.post('/create-deck', (req, res) => {
 
 // 덱 정보 요청
 router.get('/get-deck-info', (req, res) => {
-    const params = [req.query.deckId];
+    const params = [Number(req.query.deckId)];
     console.log('DeckId = ', params);
 
     // 테스트단

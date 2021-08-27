@@ -1,4 +1,4 @@
-import {Fragment, useState, useEffect} from 'react';
+import {Fragment, useState} from 'react';
 import {Grid} from '@material-ui/core';
 import {Button} from '@material-ui/core';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -7,6 +7,7 @@ import CreateCardDialog from '../../../containers/modules/CreateCardDialog';
 import {makeStyles} from '@material-ui/core/styles';
 import Badge from '@material-ui/core/Badge';
 import ViewCarouselIcon from '@material-ui/icons/ViewCarousel';
+import {get} from 'axios';
 
 const buttonStyles = {margin: 15, display: 'inline-block'};
 const buttonWrapperStyles = {width: '100%', textAlign: 'center'};
@@ -36,19 +37,26 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function DeckStatus(props) {
+    const deckInfo = props.deckInfo;
+    const deckId = Number(props.deckId);
     const [openCreateCardModal, setOpenCreateCardModal] = useState(false);
-    const [deckId, setDeckId] = useState(-1);
-    const [deckInfo, setDeckInfo] = useState({newCard: 0, reviewCard: 0});
     const classes = useStyles();
 
     const modalClose = () => {
         setOpenCreateCardModal(false);
     };
 
-    useEffect(() => {
-        setDeckId(props.getDeckId());
-        setDeckInfo(props.getDeckInfo());
-    }, []);
+    const clickStart = () => {
+        const url = `/api/decks/call-study-card?deckId=${deckId}`;
+
+        get(url)
+            .then(res => {})
+            .catch(err => console.log(err));
+    };
+
+    const clickCancel = () => {
+        props.history.push('/');
+    };
 
     return (
         <div className={classes.centerBox}>
@@ -70,12 +78,12 @@ export default function DeckStatus(props) {
                             <Container maxWidth='sm'>
                                 <div style={buttonWrapperStyles}>
                                     <div style={buttonStyles}>
-                                        <Button variant='contained' color='primary'>
+                                        <Button variant='contained' color='primary' onClick={clickStart}>
                                             start
                                         </Button>
                                     </div>
                                     <div style={buttonStyles}>
-                                        <Button variant='contained' color='secondary'>
+                                        <Button variant='contained' color='secondary' onClick={clickCancel}>
                                             cancel
                                         </Button>
                                     </div>

@@ -4,22 +4,20 @@ import {get, post} from 'axios';
 
 function mapStateToProps(state) {
     return {
-        getDeckId: function () {
-            return Number(state.deckReducer.deckId);
-        },
-        getDeckInfo: function () {
-            console.log('deckStatusContainer ~', state.deckReducer.deckId);
-            console.log('deckStatusContainer ~', state.accountReducer.isLogined);
-            console.log('deckStatusContainer ~', state.deckReducer.deckList);
-            console.log('deckStatusContainer ~', state.deckReducer.deckInfo);
-            console.log('deckStatusContainer ~', state.deckReducer);
-            return state.deckReducer.deckInfo;
-        },
+        deckId: state.deckReducer.deckId,
+        deckInfo: state.deckReducer.deckInfo,
     };
 }
 
 function mapDispatchToProps(dispatch) {
-    return {};
+    return {
+        setStudyCards: studyCards => {
+            dispatch({
+                type: 'SET_STUDY_CARDS',
+                studyCards: studyCards,
+            });
+        },
+    };
 }
 
-export default connect(mapStateToProps, null)(DeckStatus);
+export default connect(mapStateToProps, mapDispatchToProps)(DeckStatus);

@@ -88,7 +88,7 @@ export default function TopBar(props) {
     };
 
     const openCreateCardDialog = () => {
-        const id = sessionStorage.getItem('primaryKey');
+        const id = localStorage.getItem('primaryKey');
         const url = '/api/decks/callAllDecks/?id=' + id;
         get(url)
             .then(res => {
@@ -111,7 +111,7 @@ export default function TopBar(props) {
     };
 
     const doLogout = () => {
-        sessionStorage.removeItem('primaryKey');
+        localStorage.removeItem('primaryKey');
         props.doLogout();
     };
 

@@ -51,7 +51,7 @@ export default function CreateDeckDialog(props) {
             };
             const data = {
                 deckName: name,
-                userId: Number(sessionStorage.getItem('primaryKey')),
+                userId: Number(localStorage.getItem('primaryKey')),
             };
 
             post(url, data, config)

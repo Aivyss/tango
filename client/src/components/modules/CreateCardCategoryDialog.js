@@ -40,7 +40,7 @@ const useStyles = makeStyles(theme => ({
         marginTop: theme.spacing(3),
     },
     textField: {
-        width: '25ch',
+        width: '50ch',
     },
     formControl: {
         margin: theme.spacing(1),
@@ -92,7 +92,7 @@ export default function CreateCardCategoryDialog(props) {
         const strLength = cardName ? cardName.length : 0;
         if (strLength > 0) {
             let url = `/api/cards/checkDuplicateCardName`;
-            const userId = sessionStorage.getItem('primaryKey');
+            const userId = localStorage.getItem('primaryKey');
             url += `/?userId=${userId}&`;
             url += `cardName=${cardName}`;
 
@@ -125,7 +125,7 @@ export default function CreateCardCategoryDialog(props) {
                     return arr;
                 }
             };
-            const userId = sessionStorage.getItem('primaryKey');
+            const userId = localStorage.getItem('primaryKey');
             removeNulls(backFields);
             const data = {
                 userId: userId,
@@ -167,7 +167,13 @@ export default function CreateCardCategoryDialog(props) {
                         </Avatar>
                     </ListItemAvatar>
                     <ListItem>
-                        <TextField value={colName} placeholder={`Col${colId}`} id={`t-${colId}`} onChange={writeCol} />
+                        <TextField
+                            className={classes.textField}
+                            value={colName}
+                            placeholder={`Col${colId}`}
+                            id={`t-${colId}`}
+                            onChange={writeCol}
+                        />
                     </ListItem>
                     <ListItemSecondaryAction id={`b-${colId}`}>
                         <IconButton
@@ -228,6 +234,7 @@ export default function CreateCardCategoryDialog(props) {
                                 </ListItemAvatar>
                                 <ListItem>
                                     <TextField
+                                        className={classes.textField}
                                         error={error}
                                         value={cardName}
                                         placeholder='Card Name'

@@ -33,7 +33,7 @@ const useStyles = makeStyles(theme => ({
         flex: 1,
     },
     textField: {
-        width: '75ch',
+        width: '55ch',
     },
     formControl: {
         margin: theme.spacing(1),
@@ -157,7 +157,7 @@ export default function CreateCardDialog(props) {
     };
 
     useEffect(() => {
-        const userId = sessionStorage.getItem('primaryKey');
+        const userId = localStorage.getItem('primaryKey');
         const url = '/api/cards/call-all-card-categories?userId=' + userId;
 
         get(url)

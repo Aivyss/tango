@@ -25,7 +25,7 @@ function mapDispatchToPros(dispatch) {
             });
         },
         setDeckInfo: function (deckId) {
-            const url = '/api/get-deck-info/?deckId=' + deckId;
+            const url = '/api/decks/get-deck-info/?deckId=' + deckId;
 
             return get(url)
                 .then(res => {
