@@ -24,4 +24,3 @@ yarn-error.log*
 
 # database
 /database.json
-/anki_sql.sql

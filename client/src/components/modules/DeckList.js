@@ -52,10 +52,8 @@ function RenderRow(props) {
             style={style}
             key={index}
             onClick={() => {
-                console.log('deckList ~ button ~ deckId: ', deckList[index].DECK_ID);
                 const deckId = Number(deckList[index].DECK_ID);
                 if (prevProps !== null) {
-                    prevProps.setTargetDeckId(deckId);
                     prevProps.setDeckInfo(deckId).then(() => {
                         prevProps.setTargetDeck(deckId, deckList[index].DECK_NAME);
                         history.push('/deck-room');

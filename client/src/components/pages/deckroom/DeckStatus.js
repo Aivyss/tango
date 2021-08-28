@@ -38,12 +38,7 @@ const useStyles = makeStyles(theme => ({
 export default function DeckStatus(props) {
     const deckInfo = props.deckInfo;
     const deckId = Number(props.deckId);
-    const [openCreateCardModal, setOpenCreateCardModal] = useState(false);
     const classes = useStyles();
-
-    const modalClose = () => {
-        setOpenCreateCardModal(false);
-    };
 
     const clickStart = () => {
         const url = `/api/decks/call-study-card?deckId=${deckId}`;

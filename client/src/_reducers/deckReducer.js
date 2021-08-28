@@ -1,8 +1,9 @@
 const initState = {
-    deckList: [],
+    deckList: [], // 유저가 생성한 덱의 리스트
     deckId: -1, // 타겟 덱아이디
     deckInfo: {}, // 타겟 덱정보
-    studyCards: [],
+    targetDeckName: '', // 타겟덱 이름
+    studyCards: [], // 타겟 덱의 공부할 카드
 };
 
 export default function deckReducer(state = initState, action) {
@@ -15,7 +16,11 @@ export default function deckReducer(state = initState, action) {
         case 'SET_DECK_INFO':
             return {...state, deckInfo: action.deckInfo};
         case 'SET_TARGET_DECK':
-            return {...state, deckId: action.deckId};
+            if (action.targetDeckName) {
+                return {...state, deckId: action.deckId, targetDeckName: action.targetDeckName};
+            } else {
+                return {...state, deckId: action.deckId};
+            }
         case 'SET_STUDY_CARDS':
             return {...state, studyCards: action.studyCards};
         default:
