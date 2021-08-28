@@ -1,5 +1,9 @@
 **<h1 align="center"> Tango </h1>**
 <divide/>
+<h2> 0. Demo pictures </h2>
+<p align="center">
+<img src="https://user-images.githubusercontent.com/64432366/131217232-d15e68eb-fce9-4aba-ab63-caef76a54f11.PNG" width="450" height="320"/>&nbsp;&nbsp;<img src="https://user-images.githubusercontent.com/64432366/131217237-d48b56c3-8aa6-4561-b278-75c71d542e18.PNG" width="450" height="320"/>
+<img src="https://user-images.githubusercontent.com/64432366/131217242-feed8546-278c-4ce6-ae66-9daf75c1ed90.PNG" width="450" height="320"/>&nbsp;&nbsp;<img src="https://user-images.githubusercontent.com/64432366/131217243-b814b1fb-1cb9-4564-9c1a-318d0e738e9f.PNG" width="450" height="320"/></p>
 <h2> 1. Abstract </h2>
 This is Web application of word learning based on SM-2 Algorithm.
 Maybe It looks like Anki. I agree. I started this project for a practice of React. I just want to make Anki on web-based-environment. Anyway, anybody can join this project.
