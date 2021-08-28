@@ -268,4 +268,27 @@ router.post('/create-card', (req, res) => {
     // });
 });
 
+// 학습 업데이트
+router.post('/update-cards-status', (req, res) => {
+    const [frontId, eFactor, repetition] = req.body;
+    let [interval, dueDate] = req.body;
+    interval *= 86400;
+    const sql = `update
+        CARD_FRONT_TABLE
+    set
+        DUE_DATE = DATE_ADD(DUE_DATE, ? SECOND)
+        ,E_FACTOR = ?
+        ,REPETITION = ?
+    where
+        FRONT_ID = ?
+    `;
+    conn.query(sql, [interval, eFactor, repetition, frontId], err => {
+        if (err) {
+            res.send(false);
+            throw err;
+        }
+        res.send(true);
+    });
+});
+
 module.exports = router;

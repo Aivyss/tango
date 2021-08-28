@@ -17,6 +17,12 @@ function mapDispatchToProps(dispatch) {
                 sideNavBarIsOpen: bools,
             });
         },
+        setStudyCards: array => {
+            dispatch({
+                type: 'SET_STUDY_CARDS',
+                studyCards: array,
+            });
+        },
     };
 }
 

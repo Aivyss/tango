@@ -32,6 +32,8 @@ export default function SideNav(props) {
     };
 
     const goToHome = () => {
+        props.handleSideNavBar(false);
+        props.handleStudyModeDialog(false);
         history.push('/');
     };
 

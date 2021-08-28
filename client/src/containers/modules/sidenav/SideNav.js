@@ -15,6 +15,12 @@ function mapDispatchToProps(dispatch) {
                 sideNavBarIsOpen: bools,
             });
         },
+        handleStudyModeDialog: bools => {
+            dispatch({
+                type: 'HANDLE_STUDY_MODE_DIALOG',
+                studyModeDialogIsOpen: bools,
+            });
+        },
     };
 }
 
