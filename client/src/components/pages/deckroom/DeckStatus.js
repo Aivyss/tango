@@ -3,7 +3,6 @@ import {Grid} from '@material-ui/core';
 import {Button} from '@material-ui/core';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Container from '@material-ui/core/Container';
-import CreateCardDialog from '../../../containers/modules/CreateCardDialog';
 import {makeStyles} from '@material-ui/core/styles';
 import Badge from '@material-ui/core/Badge';
 import ViewCarouselIcon from '@material-ui/icons/ViewCarousel';
@@ -52,7 +51,8 @@ export default function DeckStatus(props) {
         get(url)
             .then(res => {
                 const data = res.data;
-                console.log('🚀 ~ file: DeckStatus.js ~ line 55 ~ clickStart ~ data', data);
+                props.setStudyCards(data);
+                props.handleStudyModeDialog(true);
             })
             .catch(err => console.log(err));
     };
@@ -67,10 +67,10 @@ export default function DeckStatus(props) {
                 <Grid container spacing={3}>
                     <Grid item xs={12}>
                         <div className={classes.root}>
-                            <Badge badgeContent={deckInfo.newCard} color='primary'>
+                            <Badge badgeContent={deckInfo.newCard.toString()} color='primary'>
                                 <ViewCarouselIcon fontSize='large' />
                             </Badge>
-                            <Badge badgeContent={deckInfo.reviewCard} color='error'>
+                            <Badge badgeContent={deckInfo.reviewCard.toString()} color='error'>
                                 <ViewCarouselIcon fontSize='large' />
                             </Badge>
                         </div>
@@ -95,7 +95,6 @@ export default function DeckStatus(props) {
                         </Fragment>
                     </Grid>
                 </Grid>
-                <CreateCardDialog open={openCreateCardModal} deckId={deckId} setOpen={modalClose} />
             </div>
         </div>
     );

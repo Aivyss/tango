@@ -1,6 +1,5 @@
 import {connect} from 'react-redux';
 import CreateCardDialog from '../../components/modules/CreateCardDialog';
-import {get, post} from 'axios';
 
 function mapStateToProps(state) {
     return {

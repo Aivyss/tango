@@ -4,6 +4,7 @@ const initState = {
     createCardCategoryDialogIsOpen: false,
     loginDialogIsOpen: true,
     targetCardType: -1,
+    studyModeDialogIsOpen: false,
 };
 
 export default function dialogReducer(state = initState, action) {
@@ -16,6 +17,8 @@ export default function dialogReducer(state = initState, action) {
             return {...state, loginDialogIsOpen: action.loginDialogIsOpen};
         case 'HANDLE_CREATE_CARD_CATEGORY_DIALOG':
             return {...state, createCardCategoryDialogIsOpen: action.createCardCategoryDialogIsOpen};
+        case 'HANDLE_STUDY_MODE_DIALOG':
+            return {...state, studyModeDialogIsOpen: action.studyModeDialogIsOpen};
         default:
             return state;
     }

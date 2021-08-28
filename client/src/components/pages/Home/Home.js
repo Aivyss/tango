@@ -1,18 +1,18 @@
-import {useEffect} from 'react';
-import DeckList from '../../../containers/modules/DackList';
+import DeckList from '../../../containers/modules/DeckList';
 import {Route, Switch} from 'react-router-dom';
 import CreateDeckDialog from '../../../containers/modules/CreateDeckDialog';
-import DeckRoom from '../../../components/pages/deckroom/DeckRoom';
 import TopBar from '../../../containers/modules/TopBar';
 import CreateCardDialog from '../../../containers/modules/CreateCardDialog';
 import CreateCardCategoryDialog from '../../../containers/modules/CreateCardCategoryDialog';
-
+import DeckRoom from '../deckroom/DeckRoom';
 export default function Home(props) {
     return (
         <>
             <TopBar />
             <Switch>
-                <Route path='/deck-room' component={DeckRoom} />
+                <Route exact path='/deck-room'>
+                    <DeckRoom />
+                </Route>
                 <Route path='/'>
                     <DeckList />
                 </Route>

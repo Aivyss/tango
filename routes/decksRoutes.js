@@ -1,5 +1,4 @@
 /* eslint no-param-reassign: ["error", { "props": true, "ignorePropertyModificationsFor": ["curr"] }] */
-const {json} = require('body-parser');
 const express = require('express');
 const router = express.Router();
 const conn = require('../database');
@@ -41,10 +40,47 @@ router.post('/create-deck', (req, res) => {
 // 덱 정보 요청
 router.get('/get-deck-info', (req, res) => {
     const params = [Number(req.query.deckId)];
-    console.log('DeckId = ', params);
-
-    // 테스트단
-    res.send({newCard: 25, reviewCard: 10});
+    const sqlOne = `select
+        COUNT(*)
+    from
+        CARD_FRONT_TABLE
+    where
+        CREATE_DATE = DUE_DATE
+        and
+        DECK_ID = ?
+    ORDER BY
+        RAND()
+    `;
+    const sqlTwo = `select
+        COUNT(*)
+    from
+        CARD_FRONT_TABLE
+    where
+        CREATE_DATE <> DUE_DATE
+        and
+        DUE_DATE <= NOW()
+        and
+        DECK_ID = ?
+    order by
+        RAND()
+    `;
+    (async () => {
+        const connection = await pool.getConnection(async conn2 => conn2);
+        try {
+            let newRows = await connection.query(sqlOne, params);
+            newRows = JSON.parse(JSON.stringify(newRows[0][0]['COUNT(*)']));
+            console.log('🚀 ~ file: decksRoutes.js ~ line 59 ~ newRows', newRows);
+            let oldRows = await connection.query(sqlTwo, params);
+            oldRows = JSON.parse(JSON.stringify(oldRows[0][0]['COUNT(*)']));
+            console.log('🚀 ~ file: decksRoutes.js ~ line 75 ~ oldRows', oldRows);
+            res.send({newCard: newRows, reviewCard: oldRows});
+        } catch (err) {
+            console.log(err);
+            res.send({});
+        } finally {
+            connection.release();
+        }
+    })();
 });
 
 // 공부할 카드 호출

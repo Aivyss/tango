@@ -1,6 +1,5 @@
 import {connect} from 'react-redux';
 import CreateDeckDialog from '../../components/modules/CreateDeckDialog';
-import {get, post} from 'axios';
 
 function mapStateToProps(state) {
     return {
