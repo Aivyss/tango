@@ -2,10 +2,10 @@ import React, {useState, useEffect} from 'react';
 import {DataGrid} from '@mui/x-data-grid';
 import {createTheme, darken, lighten} from '@material-ui/core/styles';
 import {makeStyles} from '@material-ui/styles';
-import {Grid, IconButton, Paper} from '@material-ui/core';
+import {Grid, IconButton, Paper, TextField} from '@material-ui/core';
 import Edit from '@material-ui/icons/Edit';
 import DeleteOutlined from '@material-ui/icons/DeleteOutlined';
-import {get} from 'axios';
+import {get, put} from 'axios';
 
 function getThemePaletteMode(palette) {
     return palette.type || palette.mode;
@@ -114,10 +114,70 @@ function EditButtons(props) {
     );
 }
 
+function RenderSelectedCard(props) {
+    const card = props.card;
+    const stylesThree = paperStyles();
+
+    const sendToServerBackColChanges = (colData, id) => {
+        const config = {
+            headers: {
+                'content-type': 'application/json',
+            },
+        };
+        const data = {
+            BACK_DATA: colData,
+            BACK_ID: id,
+        };
+        const url = `/api/cards/edit-back-col`;
+
+        return put(url, data, config);
+    };
+
+    const editCols = e => {
+        const text = e.target.value;
+        const id = Number(e.target.id);
+
+        card.BACK_COLS[0].some(curr => {
+            if (curr.BACK_ID === id) {
+                sendToServerBackColChanges(text, id)
+                    .then(res => {
+                        curr.BACK_DATA = text;
+                        props.editSelectedCardState(card);
+                    })
+                    .catch(err => console.log(err));
+                return true;
+            }
+        });
+    };
+
+    return (
+        <React.Fragment>
+            <Paper className={stylesThree.root} elevation={3} />
+
+            {card.BACK_COLS[0] ? (
+                card.BACK_COLS[0].map(curr => {
+                    return (
+                        <Paper key={curr.BACK_ID} className={stylesThree.root} elevation={3}>
+                            <TextField
+                                id={curr.BACK_ID}
+                                value={curr.BACK_DATA}
+                                label='Filled'
+                                variant='filled'
+                                onChange={editCols}
+                            />
+                        </Paper>
+                    );
+                })
+            ) : (
+                <div></div>
+            )}
+        </React.Fragment>
+    );
+}
+
 export default function StylingRowsGrid() {
     const stylesOne = tableStyles();
     const stylesTwo = paperContainerStyles();
-    const stylesThree = paperStyles();
     const cols = [
         {field: 'FRONT_ID', headerName: 'ID', width: 100},
         {field: 'FRONT_DATA', headerName: 'front', width: 130},
@@ -137,54 +197,29 @@ export default function StylingRowsGrid() {
             disableReorder: true,
         },
     ];
-    const [rows, setRows] = React.useState([]);
-    const testRow = [
-        {
-            id: 1,
-            FRONT_ID: 25,
-            FRONT_DATA: 'asdf',
-            CARD_NAME: 'my word',
-            KIND_NAME: '테스트분류',
-            DECK_NAME: '테스트덱',
-            DUE_DATE: '2021-08-29',
-        },
-        {
-            id: 2,
-            FRONT_ID: 25,
-            FRONT_DATA: 'aaaa',
-            CARD_NAME: 'my word',
-            KIND_NAME: '테스트분류',
-            DECK_NAME: '테스트덱',
-            DUE_DATE: '2021-08-29',
-        },
-        {
-            id: 3,
-            FRONT_ID: 25,
-            FRONT_DATA: 25,
-            CARD_NAME: 'my word',
-            KIND_NAME: '테스트분류',
-            DECK_NAME: '테스트덱',
-            DUE_DATE: '2021-08-29',
-        },
-        {
-            id: 4,
-            FRONT_ID: 25,
-            FRONT_DATA: 25,
-            CARD_NAME: 'my word',
-            KIND_NAME: '테스트분류',
-            DECK_NAME: '테스트덱',
-            DUE_DATE: '2021-08-29',
-        },
-        {
-            id: 5,
-            FRONT_ID: 25,
-            FRONT_DATA: 25,
-            CARD_NAME: 'my word',
-            KIND_NAME: '테스트분류',
-            DECK_NAME: '테스트덱',
-            DUE_DATE: '2021-08-29',
-        },
-    ];
+    const [rows, setRows] = useState([]);
+    const [selectedCard, setSelectedCard] = useState({});
+
+    const viewCardCols = params => {
+        console.log(params.id); // it's FRONT_ID
+        const card = searchCard(rows, params.id);
+        setSelectedCard(card);
+    };
+    const searchCard = (cardList, id) => {
+        let returnCol = null;
+
+        cardList.some(curr => {
+            if (curr.id === id) {
+                returnCol = curr;
+                return true;
+            }
+        });
+
+        return returnCol;
+    };
+    const editSelectedCardState = card => {
+        setSelectedCard(card);
+    };
 
     // call all cards after first rendering
     useEffect(() => {
@@ -208,20 +243,12 @@ export default function StylingRowsGrid() {
             <Grid container spacing={6}>
                 <Grid item xs={12} sm={6}>
                     <div style={{height: '82vh', width: '100%'}} className={stylesOne.root}>
-                        <DataGrid columns={cols} rows={rows} />
+                        <DataGrid columns={cols} rows={rows} onCellClick={viewCardCols} />
                     </div>
                 </Grid>
                 <Grid item xs={12} sm={6} justifyContent='center' alignItems='center'>
                     <div className={stylesTwo.root}>
-                        <Paper className={stylesThree.root} elevation={3} />
-                        <Paper className={stylesThree.root} elevation={3} />
-                        <Paper className={stylesThree.root} elevation={3} />
-                        <Paper className={stylesThree.root} elevation={3} />
-                        <Paper className={stylesThree.root} elevation={3} />
-                        <Paper className={stylesThree.root} elevation={3} />
-                        <Paper className={stylesThree.root} elevation={3} />
-                        <Paper className={stylesThree.root} elevation={3} />
-                        <Paper className={stylesThree.root} elevation={3} />
+                        <RenderSelectedCard card={selectedCard} editSelectedCardState={editSelectedCardState} />
                     </div>
                 </Grid>
             </Grid>
