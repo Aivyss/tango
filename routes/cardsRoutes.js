@@ -299,54 +299,59 @@ router.put('/update-cards-status', (req, res) => {
 
 // 카드 전체 조회 (덱무관)
 router.get('/call-all-of-cards', (req, res) => {
-    (async () => {
-        const connection = await pool.getConnection(async conn2 => conn2);
-        try {
-            const {userId} = req.query;
-            const sqlOne = `select 
-                D.DECK_ID
-                ,D.DECK_NAME
-                ,F.FRONT_DATA
-                ,F.FRONT_ID
-                ,F.DUE_DATE
-                ,K.KIND_ID
-                ,K.CARD_NAME
-            from
-                DECK_TABLE as D
-                ,CARD_FRONT_TABLE as F
-                ,KIND_OF_CARD_TABLE as K
-                ,USER_TABLE as U
-            where 
-                K.KIND_ID = F.KIND_ID
-                and 
-                D.DECK_ID = F.DECK_ID 
-                and
-                U.ID = ?`;
-            const sqlTwo = `select 
+    const userId = Number(req.query.userId);
+    const sqlOne = `select 
+        D.DECK_ID
+        ,D.DECK_NAME
+        ,F.FRONT_DATA
+        ,F.FRONT_ID
+        ,F.DUE_DATE
+        ,K.KIND_ID
+        ,K.CARD_NAME
+    from
+        DECK_TABLE as D
+        ,CARD_FRONT_TABLE as F
+        ,KIND_OF_CARD_TABLE as K
+        ,USER_TABLE as U
+    where 
+        K.KIND_ID = F.KIND_ID
+        and 
+        D.DECK_ID = F.DECK_ID 
+        and
+        U.ID = ?`;
+    conn.query(sqlOne, [userId], (err, rows) => {
+        if (err) throw err;
+        res.send(JSON.parse(JSON.stringify(rows)));
+    });
+});
+
+// back column update
+router.put('/edit-back-col', (req, res) => {
+    const {BACK_ID, BACK_DATA} = req.body;
+    const sql = `update CARD_BACK_TABLE
+    SET
+        BACK_DATA = ?
+    WHERE
+        BACK_ID = ?`;
+
+    conn.query(sql, [BACK_DATA, BACK_ID], err => {
+        if (err) throw err;
+        res.send(true);
+    });
+});
+
+// call back columns
+router.get('/get-back-cols', (req, res) => {
+    const frontId = Number(req.query.frontId);
+    const sql = `select 
                 *
             from 
                 CARD_BACK_TABLE
             where 
                 FRONT_ID = ?`;
-
-            let [rows, err] = await connection.query(sqlOne, [userId]);
-            rows = JSON.parse(JSON.stringify(rows));
-
-            const backColsList = await Promise.all(rows.map(async curr => connection.query(sqlTwo, curr.FRONT_ID)));
-
-            rows.map((curr, idx) => {
-                curr.BACK_COLS = backColsList[idx];
-                return true;
-            });
-
-            res.send(rows);
-        } catch (err) {
-            console.log(err);
-            throw err;
-        } finally {
-            connection.release();
-        }
-    })();
+    conn.query(sql, [frontId], (err, rows) => {
+        if (err) throw err;
+        res.send(JSON.parse(JSON.stringify(rows)));
+    });
 });
-
 module.exports = router;

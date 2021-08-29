@@ -115,8 +115,9 @@ function EditButtons(props) {
 }
 
 function RenderSelectedCard(props) {
-    const card = props.card;
     const stylesThree = paperStyles();
+    const card = props.card;
+    const [cols, setCols] = useState([]);
 
     const sendToServerBackColChanges = (colData, id) => {
         const config = {
@@ -134,15 +135,32 @@ function RenderSelectedCard(props) {
     };
 
     const editCols = e => {
+        e.stopPropagation();
+        e.preventDefault();
         const text = e.target.value;
+        console.log('🚀 ~ file: CardList.js ~ line 141 ~ RenderSelectedCard ~ text', text);
         const id = Number(e.target.id);
 
-        card.BACK_COLS[0].some(curr => {
+        // let idx = -1;
+        // for (let i = 0; i < cols.length; i += 1) {
+        //     if (cols[i].BACK_ID === id) {
+        //         idx = i;
+        //         break;
+        //     }
+        // }
+        // sendToServerBackColChanges(text, id)
+        //     .then(res => {
+        //         cols[idx].BACK_DATA = text;
+        //         setCols([...cols]);
+        //     })
+        //     .catch(err => console.log(err));
+
+        cols.some(curr => {
             if (curr.BACK_ID === id) {
                 sendToServerBackColChanges(text, id)
                     .then(res => {
                         curr.BACK_DATA = text;
-                        props.editSelectedCardState(card);
+                        setCols([...cols]);
                     })
                     .catch(err => console.log(err));
                 return true;
@@ -150,12 +168,26 @@ function RenderSelectedCard(props) {
         });
     };
 
+    useEffect(() => {
+        const frontId = card.FRONT_ID;
+        console.log('???');
+        if (frontId) {
+            const url = '/api/cards/get-back-cols?frontId=' + frontId;
+            get(url)
+                .then(res => {
+                    const data = res.data;
+                    setCols(data);
+                })
+                .catch(err => console.log(err));
+        }
+    }, [card]);
+
     return (
         <React.Fragment>
             <Paper className={stylesThree.root} elevation={3} />
 
-            {card.BACK_COLS[0] ? (
-                card.BACK_COLS[0].map(curr => {
+            {cols.length ? (
+                cols.map(curr => {
                     return (
                         <Paper key={curr.BACK_ID} className={stylesThree.root} elevation={3}>
                             <TextField
@@ -201,7 +233,6 @@ export default function StylingRowsGrid() {
     const [selectedCard, setSelectedCard] = useState({});
 
     const viewCardCols = params => {
-        console.log(params.id); // it's FRONT_ID
         const card = searchCard(rows, params.id);
         setSelectedCard(card);
     };
@@ -217,26 +248,23 @@ export default function StylingRowsGrid() {
 
         return returnCol;
     };
-    const editSelectedCardState = card => {
-        setSelectedCard(card);
-    };
 
     // call all cards after first rendering
     useEffect(() => {
-        const url = `/api/cards/call-all-of-cards?userId=` + localStorage.getItem('primaryKey');
-
-        get(url)
-            .then(res => {
-                const data = res.data;
-
-                data.map(curr => {
-                    curr.id = curr.FRONT_ID;
-                    return true;
-                });
-                setRows(data);
-            })
-            .catch(err => console.log(err));
-    }, []);
+        // ! I don't know why I need two rendering. I just guess asynchronous delay.
+        if (rows.length === 0) {
+            const url = `/api/cards/call-all-of-cards?userId=` + localStorage.getItem('primaryKey');
+            get(url)
+                .then(res => {
+                    const data = res.data;
+                    data.forEach(curr => {
+                        curr.id = curr.FRONT_ID;
+                    });
+                    setRows(data);
+                })
+                .catch(err => console.log(err));
+        }
+    }, [rows]);
 
     return (
         <div>
@@ -248,7 +276,7 @@ export default function StylingRowsGrid() {
                 </Grid>
                 <Grid item xs={12} sm={6} justifyContent='center' alignItems='center'>
                     <div className={stylesTwo.root}>
-                        <RenderSelectedCard card={selectedCard} editSelectedCardState={editSelectedCardState} />
+                        <RenderSelectedCard card={selectedCard} />
                     </div>
                 </Grid>
             </Grid>

@@ -146,7 +146,7 @@ export default function CreateCardCategoryDialog(props) {
                         setBackFields([]);
                         setError(false);
 
-                        const url = '/api/cards/callAllCardCategories?id=' + userId;
+                        const url = '/api/cards/call-all-card-categories?userId=' + userId;
                         get(url).then(res => {
                             const data = res.data;
                             props.setAllCardCategories(data);

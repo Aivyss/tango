@@ -101,6 +101,7 @@ export default function TopBar(props) {
     const doLogout = () => {
         localStorage.removeItem('primaryKey');
         props.doLogout();
+        history.push('/');
     };
 
     const goToHome = () => {

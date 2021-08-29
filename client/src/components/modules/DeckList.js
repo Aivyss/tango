@@ -90,7 +90,7 @@ export default function VirtualizedList(props) {
             });
     };
     const callCardCategoryFromApi = id => {
-        const url = '/api/cards/callAllCardCategories?id=' + id;
+        const url = '/api/cards/call-all-card-categories?userId=' + id;
 
         get(url).then(res => {
             const data = res.data;

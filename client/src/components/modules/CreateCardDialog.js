@@ -106,22 +106,24 @@ export default function CreateCardDialog(props) {
     const getOneItem = (colName = '', colId) => {
         if (colName !== null) {
             return (
-                <ListItem key={colId}>
-                    <ListItemAvatar>
-                        <Avatar>
-                            <FormatListNumbered />
-                        </Avatar>
-                    </ListItemAvatar>
-                    <ListItem>
-                        <TextField
-                            className={classes.textField}
-                            value={colsValues[colId]}
-                            placeholder={`${colName}`}
-                            id={`${colId}`}
-                            onChange={writeCol}
-                        />
+                <React.Fragment>
+                    <ListItem key={colId}>
+                        <ListItemAvatar>
+                            <Avatar>
+                                <FormatListNumbered />
+                            </Avatar>
+                        </ListItemAvatar>
+                        <ListItem>
+                            <TextField
+                                className={classes.textField}
+                                value={colsValues[colId]}
+                                placeholder={`${colName}`}
+                                id={`${colId}`}
+                                onChange={writeCol}
+                            />
+                        </ListItem>
                     </ListItem>
-                </ListItem>
+                </React.Fragment>
             );
         }
     };
