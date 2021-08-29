@@ -157,7 +157,6 @@ export default function CreateCardDialog(props) {
 
     const cleanState = () => {
         setError(false);
-        setSuccess({display: ''});
         for (const keyValueSets of Object.entries(colsValues)) {
             console.log('🚀 ~ file: CreateCardDialog.js ~ line 162 ~ cleanState ~ keyValueSets', keyValueSets);
             colsValues[keyValueSets[0]] = '';
@@ -212,6 +211,7 @@ export default function CreateCardDialog(props) {
                 .then(res => {
                     const bools = res.data;
                     if (bools) {
+                        setSuccess({display: ''});
                         cleanState();
                     }
                 })

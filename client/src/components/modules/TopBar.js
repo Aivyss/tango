@@ -1,19 +1,7 @@
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import IconButton from '@material-ui/core/IconButton';
-import Typography from '@material-ui/core/Typography';
-import InputBase from '@material-ui/core/InputBase';
+import {Button, ButtonGroup, AppBar, InputBase, Toolbar, IconButton, Typography} from '@material-ui/core';
+import {Home, Add, MeetingRoom, DnsSharp, Pageview, Search, ViewCarousel, Inbox} from '@material-ui/icons';
 import {alpha, makeStyles} from '@material-ui/core/styles';
-import Home from '@material-ui/icons/Home';
-import SearchIcon from '@material-ui/icons/Search';
-import ButtonGroup from '@material-ui/core/ButtonGroup';
-import Button from '@material-ui/core/Button';
-import Inbox from '@material-ui/icons/Inbox';
-import Add from '@material-ui/icons/Add';
-import ViewCarousel from '@material-ui/icons/ViewCarousel';
-import MeetingRoom from '@material-ui/icons/MeetingRoom';
 import {useHistory} from 'react-router-dom';
-import {DnsSharp} from '@material-ui/icons';
 import {get} from 'axios';
 
 const useStyles = makeStyles(theme => ({
@@ -119,6 +107,10 @@ export default function TopBar(props) {
         history.push('/');
     };
 
+    const goToCardList = () => {
+        history.push('/card-list');
+    };
+
     const handleCreateCardCategoryDialog = () => {
         props.handleCreateCardCategoryDialog(!props.createCardCategoryDialogIsOpen);
     };
@@ -146,6 +138,10 @@ export default function TopBar(props) {
                                 <Inbox />
                                 Deck
                             </Button>
+                            <Button onClick={goToCardList}>
+                                <Pageview fontSize='small' />
+                                Card List
+                            </Button>
                             <Button onClick={handleCreateCardCategoryDialog}>
                                 <Add fontSize='small' />
                                 <DnsSharp />
@@ -164,7 +160,7 @@ export default function TopBar(props) {
                     </div>
                     <div className={classes.search}>
                         <div className={classes.searchIcon}>
-                            <SearchIcon />
+                            <Search />
                         </div>
                         <InputBase
                             placeholder='Search…'
