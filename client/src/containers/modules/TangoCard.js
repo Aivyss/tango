@@ -6,6 +6,7 @@ function mapStateToProps(state) {
         studyCards: state.deckReducer.studyCards,
         targetDeckName: state.deckReducer.targetDeckName,
         sideNavBarIsOpen: state.dialogReducer.sideNavBarIsOpen,
+        studyModeDialogIsOpen: state.dialogReducer.studyModeDialogIsOpen,
     };
 }
 
@@ -21,6 +22,12 @@ function mapDispatchToProps(dispatch) {
             dispatch({
                 type: 'SET_STUDY_CARDS',
                 studyCards: array,
+            });
+        },
+        handleStudyModeDialog: bools => {
+            dispatch({
+                type: 'HANDLE_STUDY_MODE_DIALOG',
+                studyModeDialogIsOpen: bools,
             });
         },
     };

@@ -21,6 +21,7 @@ import {Reply, ReplyAll} from '@material-ui/icons';
 import Visibility from '@material-ui/icons/Visibility';
 import SideNav from '../../containers/modules/sidenav/SideNav';
 import {post} from 'axios';
+import {useHistory} from 'react-router';
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -93,9 +94,10 @@ function calcInterval(n, ef) {
 
 // return new E-Factor
 function calcEFactor(ef, q) {
+    // 2.5 + (0.1 - 1 * 0.1)
     let newEF = ef + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02));
 
-    if (q < 3) {
+    if (q < 2) {
         newEF = ef;
     }
 
@@ -105,59 +107,67 @@ function calcEFactor(ef, q) {
 
     return newEF;
 }
-
+// random shuffling
 function shuffleFisherYates(array) {
+    let newSort = [];
+
     for (let i = array.length - 1; i > 0; i -= 1) {
         const j = Math.floor(Math.random() - (i + 1));
         [array[i], array[j]] = [array[j], array[i]];
+        newSort.push(array.pop());
     }
-}
 
+    return newSort;
+}
+// card evaluation
 function evaluateCard(key, isBackSide, studyCards) {
+    // 오직 backSide에서 답변 선택시 실행.
     let temp = isBackSide;
     let q = -1;
     let timeInterval = 0;
     let newEFactor = studyCards[0].E_FACTOR;
 
-    if (isBackSide) {
-        switch (key) {
-            case 49:
-                q = 0;
-                break;
-            case 50:
-                q = 1;
-                break;
-            case 13:
-            case 51:
-                q = 3;
-                break;
-            case 52:
-                q = 5;
-                break;
-            default:
-                temp = !isBackSide;
-                break;
-        }
+    switch (key) {
+        case 49:
+        case 97:
+            q = 0;
+            break;
+        case 50:
+        case 98:
+            q = 2;
+            break;
+        case 13:
+        case 32:
+        case 51:
+        case 99:
+            q = 4;
+            break;
+        case 52:
+        case 100:
+            q = 5;
+            break;
+        default:
+            temp = !isBackSide;
+            break;
+    }
 
-        if (temp && q !== -1) {
+    if (temp && q !== -1) {
+        if (q >= 1) {
+            studyCards[0].REPETITION += 1;
             timeInterval = calcInterval(studyCards[0].REPETITION, studyCards[0].E_FACTOR);
-
-            if (q >= 1) {
-                newEFactor = calcEFactor(studyCards[0].E_FACTOR, q);
-                studyCards[0].E_FACTOR = newEFactor;
-                studyCards[0].REPETITION += 1;
-            } else {
-                studyCards[0].REPETITION = 0;
-                shuffleFisherYates(studyCards);
-            }
+            newEFactor = calcEFactor(studyCards[0].E_FACTOR, q);
+            studyCards[0].E_FACTOR = newEFactor;
+        } else {
+            studyCards[0].REPETITION = 0;
+            studyCards = shuffleFisherYates(studyCards);
         }
     }
 
     temp = !temp;
 
-    return [timeInterval, newEFactor, q, temp];
+    return [timeInterval, newEFactor, q, temp, studyCards];
 }
-
+// send to webserver
 function sendToServer(card, timeInterval, newEFactor) {
     const url = `/api/cards/update-cards-status`;
     const data = {
@@ -177,7 +187,8 @@ function sendToServer(card, timeInterval, newEFactor) {
 
 export default React.memo(function TangoCardFront(props) {
     const styles = useStyles();
-    const studyCards = props.studyCards;
+    const history = useHistory();
+    let studyCards = props.studyCards;
     const [flipped, setFlipped] = useState(false);
 
     const viewBackside = () => {
@@ -186,33 +197,47 @@ export default React.memo(function TangoCardFront(props) {
     const handleSideBar = () => {
         props.handleSideNavBar(true);
     };
+
+    // keyboard event
     const doKeyEvent = e => {
         e.stopPropagation();
 
         const key = e.keyCode;
         let timeInterval, newEFactor, q, temp;
         if (flipped) {
-            [timeInterval, newEFactor, q, temp] = evaluateCard(key, flipped, studyCards);
+            [timeInterval, newEFactor, q, temp, studyCards] = evaluateCard(key, flipped, studyCards);
+            console.log('🚀 ~ file: TangoCard.js ~ line 208 ~ TangoCardFront ~ timeInterval', timeInterval);
 
             if (q >= 1) {
-                sendToServer(studyCards[0], timeInterval, newEFactor).then(res => {
-                    const bool = res.data;
+                // good answers
+                sendToServer(studyCards[0], timeInterval, newEFactor)
+                    .then(res => {
+                        const bool = res.data;
+                        console.log('🚀 ~ file: TangoCard.js ~ line 199 ~ sendToServer ~ bool', bool);
 
-                    if (bool) {
-                        studyCards.splice(0, 1);
-                    } else {
-                        shuffleFisherYates(studyCards);
-                    }
+                        if (bool) {
+                            studyCards.splice(0, 1);
+                        } else {
+                            studyCards = shuffleFisherYates(studyCards);
+                        }
 
-                    props.setStudyCards(studyCards);
-                });
+                        props.setStudyCards(studyCards);
+                        setFlipped(temp);
+                    })
+                    .catch(err => console.log(err));
             } else {
+                // already shuffled (bad answer)
                 props.setStudyCards(studyCards);
+                setFlipped(temp);
             }
+        } else {
+            // front part
+            temp = true;
+            setFlipped(temp);
         }
-        setFlipped(temp);
     };
 
+    // 키보드 전역이벤트 등록
     useEffect(() => {
         document.addEventListener('keydown', doKeyEvent);
 
@@ -221,6 +246,7 @@ export default React.memo(function TangoCardFront(props) {
         };
     });
 
+    // 리턴파트
     if (studyCards.length) {
         return (
             <div>
@@ -351,7 +377,19 @@ export default React.memo(function TangoCardFront(props) {
                                             Remain: {studyCards.length}
                                         </Item>
                                         <Item className={styles.content}>
-                                            <Container maxWidth='md'></Container>
+                                            <Box px={1} mt={1} className={cx(styles.titleFont, styles.ribbon)}>
+                                                <Button
+                                                    variant='contained'
+                                                    color='primary'
+                                                    onClick={() => {
+                                                        props.handleSideNavBar(false);
+                                                        props.handleStudyModeDialog(false);
+                                                        history.push('/');
+                                                    }}
+                                                >
+                                                    完了しました。ホームに戻ります。
+                                                </Button>
+                                            </Box>
                                         </Item>
                                     </Column>
                                 </Box>
