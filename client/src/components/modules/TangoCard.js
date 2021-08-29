@@ -20,7 +20,7 @@ import {DoneAll, Done} from '@material-ui/icons';
 import {Reply, ReplyAll} from '@material-ui/icons';
 import Visibility from '@material-ui/icons/Visibility';
 import SideNav from '../../containers/modules/sidenav/SideNav';
-import {post} from 'axios';
+import {put} from 'axios';
 import {useHistory} from 'react-router';
 
 const useStyles = makeStyles(() => ({
@@ -182,7 +182,7 @@ function sendToServer(card, timeInterval, newEFactor) {
             'content-type': 'application/json',
         },
     };
-    return post(url, data, config);
+    return put(url, data, config);
 }
 
 export default React.memo(function TangoCardFront(props) {

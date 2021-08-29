@@ -269,24 +269,24 @@ router.post('/create-card', (req, res) => {
 });
 
 // 학습 업데이트
-router.post('/update-cards-status', (req, res) => {
-    console.log('백앤드로 넘어옴?');
+router.put('/update-cards-status', (req, res) => {
     console.log(req.body);
-    const {frontId, eFactor, repetition} = req.body;
-    let {interval, dueDate} = req.body;
-    interval *= 86400;
-    console.log('🚀 ~ file: cardsRoutes.js ~ line 277 ~ router.post ~ interval', interval);
-    const sql = `update
-        CARD_FRONT_TABLE
-    set
-        DUE_DATE = DATE_ADD(DUE_DATE,INTERVAL ? SECOND)
+    const {interval, frontId, eFactor, repetition, dueDate} = req.body;
+    console.log('🚀 ~ file: cardsRoutes.js ~ line 275 ~ router.post ~ dueDate', dueDate);
+    const newDueDate = Math.floor(new Date(dueDate).getTime() / 1000) + interval * 86400;
+    console.log('🚀 ~ file: cardsRoutes.js ~ line 277 ~ router.post ~ newDueDate', newDueDate);
+    const sql = `update CARD_FRONT_TABLE
+	set 
+        DUE_DATE = STR_TO_DATE(
+            FROM_UNIXTIME(?, "%Y-%m-%d %H:%i:%S"), 
+            "%Y-%m-%d %H:%i:%S"
+        )
         ,E_FACTOR = ?
         ,REPETITION = ?
     where
         FRONT_ID = ?
     `;
-    conn.query(sql, [interval, eFactor, repetition, frontId], err => {
-        console.log('백앤드로 넘어옴?');
+    conn.query(sql, [newDueDate, eFactor, repetition, frontId], err => {
         if (err) {
             res.send(false);
             throw err;
