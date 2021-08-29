@@ -99,6 +99,7 @@ export default function CreateCardDialog(props) {
     };
 
     const handleClose = () => {
+        cleanState();
         props.handleCreateCardDialog(false);
     };
 
@@ -114,7 +115,7 @@ export default function CreateCardDialog(props) {
                     <ListItem>
                         <TextField
                             className={classes.textField}
-                            value={colsValues[colId.toString()]}
+                            value={colsValues[colId]}
                             placeholder={`${colName}`}
                             id={`${colId}`}
                             onChange={writeCol}
@@ -152,6 +153,18 @@ export default function CreateCardDialog(props) {
                 .catch(err => console.log(err));
         }
         setFront(str);
+    };
+
+    const cleanState = () => {
+        setError(false);
+        setSuccess({display: ''});
+        for (const keyValueSets of Object.entries(colsValues)) {
+            console.log('🚀 ~ file: CreateCardDialog.js ~ line 162 ~ cleanState ~ keyValueSets', keyValueSets);
+            colsValues[keyValueSets[0]] = '';
+        }
+        console.log('🚀 ~ file: CreateCardDialog.js ~ line 207 ~ handleSave ~ colsValues', colsValues);
+        setColsValues({...colsValues});
+        setFront('');
     };
 
     useEffect(() => {
@@ -199,14 +212,7 @@ export default function CreateCardDialog(props) {
                 .then(res => {
                     const bools = res.data;
                     if (bools) {
-                        setError(false);
-                        setSuccess({display: ''});
-                        for (const prop in Object.entries(colsValues)) {
-                            console.log('🚀 ~ file: CreateCardDialog.js ~ line 205 ~ handleSave ~ prop', prop);
-                            colsValues[prop] = '';
-                        }
-                        setColsValues({...colsValues});
-                        setFront('');
+                        cleanState();
                     }
                 })
                 .catch(err => console.log(err));
