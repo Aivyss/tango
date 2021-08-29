@@ -5,6 +5,8 @@ import TopBar from '../../../containers/modules/TopBar';
 import CreateCardDialog from '../../../containers/modules/CreateCardDialog';
 import CreateCardCategoryDialog from '../../../containers/modules/CreateCardCategoryDialog';
 import DeckRoom from '../deckroom/DeckRoom';
+import CardList from '../CardList/CardList';
+
 export default function Home(props) {
     return (
         <>
@@ -12,6 +14,9 @@ export default function Home(props) {
             <Switch>
                 <Route exact path='/deck-room'>
                     <DeckRoom />
+                </Route>
+                <Route exact path='/card-list'>
+                    <CardList />
                 </Route>
                 <Route path='/'>
                     <DeckList />

@@ -18,6 +18,8 @@ export default function CreateDeckDialog(props) {
     let [isValidDeck, setIsValidDeck] = useState(true);
 
     const handleClose = () => {
+        setIsValidDeck(true);
+        setName('');
         props.closeDeckDialog();
     };
 
@@ -39,8 +41,8 @@ export default function CreateDeckDialog(props) {
         return isValid;
     };
 
-    const createDeck = function (name, isValidDeck) {
-        const isValid = !checkValidation(name) ? false : true;
+    const createDeck = function () {
+        const isValid = checkValidation(name);
 
         if (isValid && isValidDeck) {
             const url = '/api/decks/create-deck';
@@ -65,16 +67,22 @@ export default function CreateDeckDialog(props) {
                 })
                 .then(() => {
                     handleClose();
-                });
+                })
+                .catch(err => console.log(err));
         } else {
             alert('入力した情報が正しくありません。');
         }
     };
 
     const checkDuplicatedName = function (name, setIsValidDeck) {
-        const url = '/api/decks/checkDuplicated-deck-name?name=' + name;
+        const url = '/api/decks/checkDuplicated-deck-name';
 
-        get(url)
+        get(url, {
+            params: {
+                userId: localStorage.getItem('primaryKey'),
+                name: name,
+            },
+        })
             .then(res => {
                 const isValid = res.data.length === 0 ? true : false;
 

@@ -17,8 +17,8 @@ router.get('/callAllDecks', (req, res) => {
 
 // 덱 이름 중복조회
 router.get('/checkDuplicated-deck-name', (req, res) => {
-    const params = [req.query.name];
-    const sql = `SELECT * FROM DECK_TABLE WHERE DECK_NAME = ?`;
+    const params = [req.query.name, req.query.userId];
+    const sql = `SELECT * FROM DECK_TABLE WHERE DECK_NAME = ? AND USER_ID = ?`;
     console.log('덱 이름 중복 확인=', req.query.name);
 
     conn.query(sql, params, (err, rows, field) => {
@@ -29,10 +29,13 @@ router.get('/checkDuplicated-deck-name', (req, res) => {
 // 덱 생성
 router.post('/create-deck', (req, res) => {
     const params = [req.body.deckName, req.body.userId];
+    console.log('🚀 ~ file: decksRoutes.js ~ line 32 ~ router.post ~ params', params);
     const sql = `INSERT INTO DECK_TABLE (DECK_NAME, USER_ID) VALUES (?, ?)`;
     console.log('덱이름 =', params);
 
     conn.query(sql, params, (err, rows, field) => {
+        if (err) throw err;
+
         res.send(rows);
     });
 });
