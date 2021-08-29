@@ -2,7 +2,10 @@ import React, {useState, useEffect} from 'react';
 import {DataGrid} from '@mui/x-data-grid';
 import {createTheme, darken, lighten} from '@material-ui/core/styles';
 import {makeStyles} from '@material-ui/styles';
-import {Grid, Paper} from '@material-ui/core';
+import {Grid, IconButton, Paper} from '@material-ui/core';
+import Edit from '@material-ui/icons/Edit';
+import DeleteOutlined from '@material-ui/icons/DeleteOutlined';
+import {get} from 'axios';
 
 function getThemePaletteMode(palette) {
     return palette.type || palette.mode;
@@ -72,38 +75,140 @@ const paperStyles = makeStyles(theme => ({
     },
 }));
 
+const buttonStyles = makeStyles(
+    theme => ({
+        root: {
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: theme.spacing(1),
+            color: theme.palette.text.secondary,
+        },
+        textPrimary: {
+            color: theme.palette.text.primary,
+        },
+    }),
+    {defaultTheme},
+);
+
+function EditButtons(props) {
+    const {id} = props;
+    const classes = buttonStyles();
+    const handleEditClick = e => {};
+    const handleDeleteClick = e => {};
+
+    return (
+        <div className={classes.root}>
+            <IconButton
+                color='inherit'
+                className={classes.textPrimary}
+                size='small'
+                aria-label='edit'
+                onClick={handleEditClick}
+            >
+                <Edit fontSize='small' />
+            </IconButton>
+            <IconButton color='inherit' size='small' aria-label='delete' onClick={handleDeleteClick}>
+                <DeleteOutlined fontSize='small' />
+            </IconButton>
+        </div>
+    );
+}
+
 export default function StylingRowsGrid() {
     const stylesOne = tableStyles();
     const stylesTwo = paperContainerStyles();
     const stylesThree = paperStyles();
     const cols = [
-        {field: 'ID', width: 100},
-        {field: 'Front', width: 130},
-        {field: 'Card Categ.', width: 170},
-        {field: 'Deck', width: 120},
-        {field: 'Due Date', width: 140},
+        {field: 'FRONT_ID', headerName: 'ID', width: 100},
+        {field: 'FRONT_DATA', headerName: 'front', width: 130},
+        {field: 'CARD_NAME', headerName: 'Card Categ.', width: 170},
+        {field: 'DECK_NAME', headerName: 'Deck Name', width: 120},
+        {field: 'DUE_DATE', headerName: 'Due Date', width: 140},
+        {
+            field: 'actions',
+            headerName: 'actions',
+            renderCell: EditButtons,
+            sortable: false,
+            width: 100,
+            headerAlign: 'center',
+            filterable: 'false',
+            align: 'center',
+            disableColumnMenu: true,
+            disableReorder: true,
+        },
     ];
     const [rows, setRows] = React.useState([]);
     const testRow = [
-        {id: 25, ID: 25, Front: 'my word', 'Card Categ.': '테스트분류', Deck: '테스트덱', 'Due Date': '2021-08-29'},
-        {id: 26, ID: 25, Front: 'my word', 'Card Categ.': '테스트분류', Deck: '테스트덱', 'Due Date': '2021-08-29'},
-        {id: 27, ID: 25, Front: 'my word', 'Card Categ.': '테스트분류', Deck: '테스트덱', 'Due Date': '2021-08-29'},
-        {id: 28, ID: 25, Front: 'my word', 'Card Categ.': '테스트분류', Deck: '테스트덱', 'Due Date': '2021-08-29'},
-        {id: 29, ID: 25, Front: 'my word', 'Card Categ.': '테스트분류', Deck: '테스트덱', 'Due Date': '2021-08-29'},
-        {id: 30, ID: 25, Front: 'my word', 'Card Categ.': '테스트분류', Deck: '테스트덱', 'Due Date': '2021-08-29'},
-        {id: 31, ID: 25, Front: 'my word', 'Card Categ.': '테스트분류', Deck: '테스트덱', 'Due Date': '2021-08-29'},
-        {id: 32, ID: 25, Front: 'my word', 'Card Categ.': '테스트분류', Deck: '테스트덱', 'Due Date': '2021-08-29'},
+        {
+            id: 1,
+            FRONT_ID: 25,
+            FRONT_DATA: 'asdf',
+            CARD_NAME: 'my word',
+            KIND_NAME: '테스트분류',
+            DECK_NAME: '테스트덱',
+            DUE_DATE: '2021-08-29',
+        },
+        {
+            id: 2,
+            FRONT_ID: 25,
+            FRONT_DATA: 'aaaa',
+            CARD_NAME: 'my word',
+            KIND_NAME: '테스트분류',
+            DECK_NAME: '테스트덱',
+            DUE_DATE: '2021-08-29',
+        },
+        {
+            id: 3,
+            FRONT_ID: 25,
+            FRONT_DATA: 25,
+            CARD_NAME: 'my word',
+            KIND_NAME: '테스트분류',
+            DECK_NAME: '테스트덱',
+            DUE_DATE: '2021-08-29',
+        },
+        {
+            id: 4,
+            FRONT_ID: 25,
+            FRONT_DATA: 25,
+            CARD_NAME: 'my word',
+            KIND_NAME: '테스트분류',
+            DECK_NAME: '테스트덱',
+            DUE_DATE: '2021-08-29',
+        },
+        {
+            id: 5,
+            FRONT_ID: 25,
+            FRONT_DATA: 25,
+            CARD_NAME: 'my word',
+            KIND_NAME: '테스트분류',
+            DECK_NAME: '테스트덱',
+            DUE_DATE: '2021-08-29',
+        },
     ];
 
-    // call all cards after rendering
-    useEffect(() => {}, []);
+    // call all cards after first rendering
+    useEffect(() => {
+        const url = `/api/cards/call-all-of-cards?userId=` + localStorage.getItem('primaryKey');
+
+        get(url)
+            .then(res => {
+                const data = res.data;
+
+                data.map(curr => {
+                    curr.id = curr.FRONT_ID;
+                    return true;
+                });
+                setRows(data);
+            })
+            .catch(err => console.log(err));
+    }, []);
 
     return (
         <div>
             <Grid container spacing={6}>
                 <Grid item xs={12} sm={6}>
                     <div style={{height: '82vh', width: '100%'}} className={stylesOne.root}>
-                        <DataGrid columns={cols} rows={testRow} />
+                        <DataGrid columns={cols} rows={rows} />
                     </div>
                 </Grid>
                 <Grid item xs={12} sm={6} justifyContent='center' alignItems='center'>

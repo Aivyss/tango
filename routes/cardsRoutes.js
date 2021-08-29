@@ -1,3 +1,5 @@
+/* eslint no-param-reassign: ["error", { "props": false }] */
+
 const express = require('express');
 const router = express.Router();
 const conn = require('../database');
@@ -293,6 +295,58 @@ router.put('/update-cards-status', (req, res) => {
         }
         res.send(true);
     });
+});
+
+// 카드 전체 조회 (덱무관)
+router.get('/call-all-of-cards', (req, res) => {
+    (async () => {
+        const connection = await pool.getConnection(async conn2 => conn2);
+        try {
+            const {userId} = req.query;
+            const sqlOne = `select 
+                D.DECK_ID
+                ,D.DECK_NAME
+                ,F.FRONT_DATA
+                ,F.FRONT_ID
+                ,F.DUE_DATE
+                ,K.KIND_ID
+                ,K.CARD_NAME
+            from
+                DECK_TABLE as D
+                ,CARD_FRONT_TABLE as F
+                ,KIND_OF_CARD_TABLE as K
+                ,USER_TABLE as U
+            where 
+                K.KIND_ID = F.KIND_ID
+                and 
+                D.DECK_ID = F.DECK_ID 
+                and
+                U.ID = ?`;
+            const sqlTwo = `select 
+                *
+            from 
+                CARD_BACK_TABLE
+            where 
+                FRONT_ID = ?`;
+
+            let [rows, err] = await connection.query(sqlOne, [userId]);
+            rows = JSON.parse(JSON.stringify(rows));
+
+            const backColsList = await Promise.all(rows.map(async curr => connection.query(sqlTwo, curr.FRONT_ID)));
+
+            rows.map((curr, idx) => {
+                curr.BACK_COLS = backColsList[idx];
+                return true;
+            });
+
+            res.send(rows);
+        } catch (err) {
+            console.log(err);
+            throw err;
+        } finally {
+            connection.release();
+        }
+    })();
 });
 
 module.exports = router;
