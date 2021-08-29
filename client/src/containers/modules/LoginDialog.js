@@ -16,10 +16,16 @@ function mapDispatchToProps(dispatch) {
                 isLogined: param,
             });
         },
-        closeLoginDislog: () => {
+        handleLoginDialog: bools => {
             dispatch({
                 type: 'HANDLE_LOGIN_DIALOG',
-                loginDialogIsOpen: false,
+                loginDialogIsOpen: bools,
+            });
+        },
+        handleSignupDialog: bools => {
+            dispatch({
+                type: 'HANDLE_SIGN_UP_DIALOG',
+                signupDialogIsOpen: bools,
             });
         },
     };

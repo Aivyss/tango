@@ -16,16 +16,14 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 export default function SignupDialog(props) {
-    let [open, setOpen] = useState(false);
     let [id, setId] = useState('');
     let [pw, setPw] = useState('');
     let [pwCf, setPwCf] = useState('');
     let [isValidAccount, setIsValidAccount] = useState(true);
 
-    const handleClickOpen = () => {};
-
     const handleClose = () => {
-        setOpen(false);
+        props.handleSignupDialog(false);
+        props.handleLoginDialog(true);
     };
 
     const checkValidation = value => {
@@ -66,9 +64,12 @@ export default function SignupDialog(props) {
             ? false
             : true;
         const pwIsValid = pw === pwCf;
+        console.log('🚀 ~ file: SignupDialog.js ~ line 67 ~ signup ~ pwIsValid', pwIsValid);
+        console.log('🚀 ~ file: SignupDialog.js ~ line 60 ~ signup ~ isValid', isValid);
+        console.log('🚀 ~ file: SignupDialog.js ~ line 71 ~ signup ~ isValidAccount', isValidAccount);
 
         if (isValid && pwIsValid && isValidAccount) {
-            const url = '/api/signup';
+            const url = '/api/users/signup';
             const config = {
                 headers: {
                     'content-type': 'application/json',
@@ -81,9 +82,9 @@ export default function SignupDialog(props) {
 
             post(url, data, config)
                 .then(res => {
-                    setOpen(false);
+                    props.handleSignupDialog(false);
+                    props.handleLoginDialog(true);
                     alert('会員登録が出来ました。');
-                    window.location.href = '/';
                 })
                 .catch(err => {
                     console.log('会員登録のエラー');
@@ -94,7 +95,7 @@ export default function SignupDialog(props) {
     };
 
     const checkDuplicatedId = () => {
-        const url = '/api/checkDuplicated-id?id=' + id;
+        const url = '/api/users/checkDuplicated-id?id=' + id;
         console.log(id);
 
         get(url)
@@ -105,16 +106,14 @@ export default function SignupDialog(props) {
                 if (!isValid) {
                     alert('中腹のアカウントです。');
                     setIsValidAccount(false);
+                } else {
+                    setIsValidAccount(true);
                 }
             })
             .catch(() => {
                 console.log('중복조회 실패');
             });
     };
-
-    useEffect(() => {
-        setOpen(props.open);
-    }, [props.open]);
 
     useEffect(() => {
         const leng = id.length;
@@ -127,7 +126,7 @@ export default function SignupDialog(props) {
         <main>
             <div>
                 <Dialog
-                    open={open}
+                    open={props.signupDialogIsOpen}
                     TransitionComponent={Transition}
                     keepMounted
                     onClose={handleClose}

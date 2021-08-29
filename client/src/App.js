@@ -4,11 +4,11 @@ import LoginDialog from './containers/modules/LoginDialog';
 import {BrowserRouter, Route} from 'react-router-dom';
 import Home from './containers/pages/Home/Home';
 import HomeTwo from './components/pages/Home/HomeTwo';
+import SignupDialog from './containers/modules/SignupDialog';
 
 function App(props) {
     const userId = localStorage.getItem('primaryKey');
     const isLogined = props.isLogined;
-    console.log('🚀 ~ file: App.js ~ line 11 ~ App ~ isLogined', isLogined);
 
     useEffect(() => {
         console.log(userId);
@@ -25,6 +25,7 @@ function App(props) {
                         <HomeTwo />
                         <Route exact path='/'>
                             <LoginDialog />
+                            <SignupDialog />
                         </Route>
                     </div>
                 )}

@@ -5,6 +5,8 @@ create table USER_TABLE (
 	,CREATE_DATE DATETIME default CURRENT_TIMESTAMP
 	,IS_DELETED INT default 0
 );
+alter table user_table add PW_SALT VARCHAR(2000) not null;
+alter table USER_TABLE modify PASSWORD VARCHAR(2000);
 
 create table DECK_TABLE (
 	DECK_ID INT primary key auto_increment

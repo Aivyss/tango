@@ -6,7 +6,6 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Slide from '@material-ui/core/Slide';
-import SignupDialog from './SignupDialog';
 import {TextField} from '@material-ui/core';
 import {post} from 'axios';
 
@@ -15,18 +14,16 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 export default function LoginDialog(props) {
-    const [signupOpen, setSignupOpen] = React.useState(false);
     const [id, setId] = React.useState('');
     const [pw, setPw] = React.useState('');
 
-    const handleClickOpen = () => {};
-
     const handleClose = () => {
-        props.closeLoginDislog();
+        props.handleLoginDialog(false);
     };
 
     const signup = () => {
-        setSignupOpen(true);
+        props.handleSignupDialog(true);
+        props.handleLoginDialog(false);
     };
 
     const doLoginProcess = () => {
@@ -46,16 +43,16 @@ export default function LoginDialog(props) {
 
             post(url, data, config)
                 .then(res => {
-                    if (res.data[0].STRING_ID === id && res.data[0].PASSWORD === pw) {
-                        localStorage.setItem('id', res.data[0].STRING_ID);
-                        localStorage.setItem('primaryKey', res.data[0].ID);
-                        handleClose(); // 모달 닫기
-                        props.doLogin(true); // 리덕스 반영
+                    if (res.data) {
+                        // success login
+                        localStorage.setItem('id', res.data.STRING_ID);
+                        localStorage.setItem('primaryKey', res.data.ID);
+                        handleClose(); // modal close
+                        props.doLogin(true); // change state
                     } else {
                         setId('');
                         setPw('');
                         props.doLogin(false);
-                        props.changeLoginStatus(false);
                         alert('ログインができませんでした。');
                     }
                 })
@@ -122,8 +119,6 @@ export default function LoginDialog(props) {
                     </Button>
                 </DialogActions>
             </Dialog>
-
-            <SignupDialog open={signupOpen} />
         </div>
     );
 }

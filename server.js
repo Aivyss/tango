@@ -1,6 +1,5 @@
 // 외부접근
 //const cors = require('cors');
-
 // express 객체
 const express = require('express'); // express js
 const app = express();
