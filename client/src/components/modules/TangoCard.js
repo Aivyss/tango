@@ -37,6 +37,7 @@ const useStyles = makeStyles(() => ({
         borderColor: '#cfd8dc',
         borderRadius: 12,
         backgroundColor: '#fff',
+        marginTop: '10vh',
     },
     titleFont: {
         fontFamily: "'Kanit', san-serif",
@@ -257,46 +258,44 @@ export default React.memo(function TangoCardFront(props) {
                     <React.Fragment>
                         <CssBaseline />
                         <Container className={styles.root} maxWidth='md'>
-                            <Typography style={{height: '85vh', display: 'flex'}}>
-                                <Grid container direction='row' justifyContent='center' alignItems='center'>
-                                    <Box maxWidth={'100%'} maxHeight={'100%'} minWidth={'75%'}>
-                                        <Column p={0} gap={3} className={styles.card}>
-                                            <Item>
-                                                <h2 className={cx(styles.titleFont, styles.header)}>
-                                                    Deck name: {props.targetDeckName}
-                                                </h2>
-                                            </Item>
-                                            <Item
-                                                py={1}
-                                                bgcolor={'rgb(255, 189, 128)'}
-                                                className={cx(styles.titleFont, styles.ribbon)}
-                                            >
-                                                Remain: {studyCards.length}
-                                            </Item>
-                                            <Item className={styles.content}>
-                                                {flipped ? (
-                                                    studyCards[0].BACK_COLS.map((curr, idx) => {
-                                                        return (
-                                                            <Box
-                                                                key={idx}
-                                                                px={1}
-                                                                mt={1}
-                                                                className={cx(styles.titleFont, styles.ribbon)}
-                                                            >
-                                                                {curr.BACK_DATA}
-                                                            </Box>
-                                                        );
-                                                    })
-                                                ) : (
-                                                    <Box px={1} mt={1} className={cx(styles.titleFont, styles.ribbon)}>
-                                                        {studyCards[0].FRONT_DATA}
-                                                    </Box>
-                                                )}
-                                            </Item>
-                                        </Column>
-                                    </Box>
-                                </Grid>
-                            </Typography>
+                            <Grid container direction='row' justifyContent='center' alignItems='center'>
+                                <Box maxWidth={'100%'} maxHeight={'100%'} minWidth={'75%'}>
+                                    <Column p={0} gap={3} className={styles.card}>
+                                        <Item>
+                                            <h2 className={cx(styles.titleFont, styles.header)}>
+                                                Deck name: {props.targetDeckName}
+                                            </h2>
+                                        </Item>
+                                        <Item
+                                            py={1}
+                                            bgcolor={'rgb(255, 189, 128)'}
+                                            className={cx(styles.titleFont, styles.ribbon)}
+                                        >
+                                            Remain: {studyCards.length}
+                                        </Item>
+                                        <Item className={styles.content}>
+                                            {flipped ? (
+                                                studyCards[0].BACK_COLS.map((curr, idx) => {
+                                                    return (
+                                                        <Box
+                                                            key={idx}
+                                                            px={1}
+                                                            mt={1}
+                                                            className={cx(styles.titleFont, styles.ribbon)}
+                                                        >
+                                                            {curr.BACK_DATA}
+                                                        </Box>
+                                                    );
+                                                })
+                                            ) : (
+                                                <Box px={1} mt={1} className={cx(styles.titleFont, styles.ribbon)}>
+                                                    {studyCards[0].FRONT_DATA}
+                                                </Box>
+                                            )}
+                                        </Item>
+                                    </Column>
+                                </Box>
+                            </Grid>
                         </Container>
                     </React.Fragment>
                 </div>

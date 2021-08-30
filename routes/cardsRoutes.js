@@ -12,6 +12,7 @@ router.get('/checkDuplicateCardName', (req, res) => {
     const sql = 'SELECT * FROM KIND_OF_CARD_TABLE WHERE USER_ID = ? AND CARD_NAME = ?';
 
     conn.query(sql, params, (err, rows, fields) => {
+        if (err) throw err;
         console.log(rows);
         console.log('🚀 ~ file: server.js ~ line 133 ~ connection.query ~ rows', rows);
         res.send(JSON.parse(JSON.stringify(rows)));
@@ -60,59 +61,6 @@ router.post('/create-card-category', (req, res) => {
             connection.release();
         }
     })();
-
-    // !deprecated, it makes bug sometimes
-    // conn.beginTransaction(err => {
-    //     if (err) {
-    //         console.log(err);
-    //         throw err;
-    //     }
-    //     const paramOne = [req.body.cardName, req.body.userId];
-    //     const sqlOne = `INSERT INTO KIND_OF_CARD_TABLE
-    //             (CARD_NAME, USER_ID)
-    //         VALUES
-    //             (?, ?)`;
-    //     let kindTablePK;
-    //     conn.query(sqlOne, paramOne, error => {
-    //         if (error) {
-    //             return conn.rollback(() => {
-    //                 res.send(false);
-    //                 throw error;
-    //             });
-    //         }
-    //         conn.query('SELECT LAST_INSERT_ID()', (keySelectError, kindId, field) => {
-    //             if (keySelectError) {
-    //                 return conn.rollback(() => {
-    //                     res.send(false);
-    //                     throw keySelectError;
-    //                 });
-    //             }
-    //             kindTablePK = JSON.parse(JSON.stringify(kindId))[0]['LAST_INSERT_ID()'];
-    //             const sqlTwo = `INSERT INTO CARD_COL_TABLE
-    //                         (KIND_ID, COL_NAME)
-    //                     VALUES
-    //                         (?, ?)`;
-    //             const paramTwo = req.body.backFields;
-    //             paramTwo.map((curr, index) =>
-    //                 conn.query(sqlTwo, [kindTablePK, curr], backFieldsError => {
-    //                     if (backFieldsError) {
-    //                         return conn.rollback(() => {
-    //                             res.send(false);
-    //                             throw backFieldsError;
-    //                         });
-    //                     }
-    //                     if (index === paramTwo.length - 1) {
-    //                         conn.commit();
-    //                         res.send(true);
-    //                     }
-    //                     return true;
-    //                 }),
-    //             );
-    //             return true;
-    //         });
-    //         return true;
-    //     });
-    // });
 });
 
 // 카드 카테고리 전체조회
@@ -205,69 +153,6 @@ router.post('/create-card', (req, res) => {
             connection.release();
         }
     })();
-
-    // !Bugs deprecated
-    // conn.beginTransaction(err => {
-    //     if (err) {
-    //         console.log(err);
-    //         res.send(false);
-    //         throw err;
-    //     } else {
-    //         // 프론트 인서트문
-    //         const sqlOne = `insert into CARD_FRONT_TABLE (
-    //             FRONT_DATA
-    //             ,DECK_ID
-    //             ,KIND_ID
-    //         ) values(
-    //             ?, ? ,?
-    //         )`;
-    //         conn.query(sqlOne, [front, deckId, cardId], frontErr => {
-    //             if (frontErr) {
-    //                 return conn.rollback(() => {
-    //                     res.send(false);
-    //                     throw frontErr;
-    //                 });
-    //             }
-
-    //             const sqlTwo = `select LAST_INSERT_ID()`;
-    //             conn.query(sqlTwo, (keySelectErr, row) => {
-    //                 if (keySelectErr) {
-    //                     return conn.rollback(() => {
-    //                         res.send(false);
-    //                         throw keySelectErr;
-    //                     });
-    //                 }
-
-    //                 const sqlThree = `insert into CARD_BACK_TABLE (
-    //                     FRONT_ID
-    //                     ,CARD_COL_ID
-    //                     ,BACK_DATA
-    //                 ) values (
-    //                     ?, ?, ?
-    //                 )`;
-    //                 const frontKey = JSON.parse(JSON.stringify(row))[0]['LAST_INSERT_ID()'];
-    //                 console.log('🚀 ~ file: cardsRoutes.js ~ line 146 ~ conn.query ~ frontKey', frontKey);
-
-    //                 // 이건 뭐라 안하네
-    //                 Object.keys(colsValues).map(prop => {
-    //                     conn.query(sqlThree, [frontKey, Number(prop), colsValues[prop]], backErr => {
-    //                         if (backErr) throw backErr;
-    //                     });
-
-    //                     return true;
-    //                 });
-    //                 res.send(true);
-    //                 conn.commit();
-
-    //                 return true;
-    //             });
-
-    //             return true;
-    //         });
-
-    //         return true;
-    //     }
-    // });
 });
 
 // 학습 업데이트
@@ -340,6 +225,20 @@ router.put('/edit-back-col', (req, res) => {
     });
 });
 
+// front card update
+router.put('/change-front-data', (req, res) => {
+    const {frontId, frontData} = req.body;
+    const sql = `update CARD_FRONT_TABLE
+    set
+        FRONT_DATA = ?
+    where
+        FRONT_ID = ?`;
+
+    conn.query(sql, [frontData, Number(frontId)], err => {
+        if (err) throw err;
+    });
+});
+
 // call back columns
 router.get('/get-back-cols', (req, res) => {
     const frontId = Number(req.query.frontId);
@@ -354,4 +253,5 @@ router.get('/get-back-cols', (req, res) => {
         res.send(JSON.parse(JSON.stringify(rows)));
     });
 });
+
 module.exports = router;

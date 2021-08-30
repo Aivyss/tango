@@ -133,7 +133,7 @@ export default function TopBar(props) {
                         Tango
                     </Typography>
                     <div className={classes.btnGroup}>
-                        <ButtonGroup variant='contained' color='tertiary' aria-label='contained primary button group'>
+                        <ButtonGroup variant='contained' color='default' aria-label='contained primary button group'>
                             <Button onClick={openCreateDeckDialog}>
                                 <Add fontSize='small' />
                                 <Inbox />

@@ -58,6 +58,42 @@ const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction='up' ref={ref} {...props} />;
 });
 
+function GetOneItem(props) {
+    const classes = useStyles();
+
+    const writeCol = e => {
+        const str = e.target.value;
+        const id = e.target.id; // colId
+
+        props.colsValues[id] = str;
+        props.setColsValues({...props.colsValues});
+    };
+
+    //colName = '', colId
+    if (props.colName !== null) {
+        return (
+            <React.Fragment>
+                <ListItem>
+                    <ListItemAvatar>
+                        <Avatar>
+                            <FormatListNumbered />
+                        </Avatar>
+                    </ListItemAvatar>
+                    <ListItem>
+                        <TextField
+                            className={classes.textField}
+                            value={props.colsValues[props.colId]}
+                            placeholder={`${props.colName}`}
+                            id={`${props.colId}`}
+                            onChange={writeCol}
+                        />
+                    </ListItem>
+                </ListItem>
+            </React.Fragment>
+        );
+    }
+}
+
 export default function CreateCardDialog(props) {
     const classes = useStyles();
     const cardList = props.cardCategories;
@@ -101,40 +137,6 @@ export default function CreateCardDialog(props) {
     const handleClose = () => {
         cleanState();
         props.handleCreateCardDialog(false);
-    };
-
-    const getOneItem = (colName = '', colId) => {
-        if (colName !== null) {
-            return (
-                <React.Fragment>
-                    <ListItem key={colId}>
-                        <ListItemAvatar>
-                            <Avatar>
-                                <FormatListNumbered />
-                            </Avatar>
-                        </ListItemAvatar>
-                        <ListItem>
-                            <TextField
-                                className={classes.textField}
-                                value={colsValues[colId]}
-                                placeholder={`${colName}`}
-                                id={`${colId}`}
-                                onChange={writeCol}
-                            />
-                        </ListItem>
-                    </ListItem>
-                </React.Fragment>
-            );
-        }
-    };
-
-    const writeCol = e => {
-        const str = e.target.value;
-        const id = e.target.id; // colId
-
-        colsValues[id] = str;
-        console.log('🚀 ~ file: CreateCardDialog.js ~ line 138 ~ CreateCardDialog ~ colsValues', colsValues);
-        setColsValues({...colsValues});
     };
 
     const writeFront = e => {
@@ -325,7 +327,15 @@ export default function CreateCardDialog(props) {
                                     </ListItem>
                                     {props.targetCardsCols
                                         ? props.targetCardsCols.map(curr => {
-                                              return getOneItem(curr.COL_NAME, curr.CARD_COL_ID);
+                                              return (
+                                                  <GetOneItem
+                                                      key={curr.CARD_COL_ID}
+                                                      colId={curr.CARD_COL_ID}
+                                                      colName={curr.COL_NAME}
+                                                      colsValues={colsValues}
+                                                      setColsValues={setColsValues}
+                                                  />
+                                              );
                                           })
                                         : ''}
                                 </List>

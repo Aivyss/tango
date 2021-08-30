@@ -8,7 +8,7 @@ import {Provider} from 'react-redux';
 // redux-persist
 import {PersistGate} from 'redux-persist/integration/react';
 import configureStore from './_store';
-import {createTheme} from '@material-ui/core/styles';
+import createTheme from '@material-ui/core/styles/createTheme';
 import {ThemeProvider} from '@material-ui/styles';
 const theme = createTheme({
     palette: {
@@ -18,10 +18,10 @@ const theme = createTheme({
         secondary: {
             main: '#5B676E',
         },
-        tertiary: {
+        inherit: {
             main: '#C7E1F0',
         },
-        quaternary: {
+        default: {
             main: '#7EC4ED',
         },
         quinary: {

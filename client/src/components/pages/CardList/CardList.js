@@ -6,6 +6,7 @@ import {Grid, IconButton, Paper, TextField} from '@material-ui/core';
 import Edit from '@material-ui/icons/Edit';
 import DeleteOutlined from '@material-ui/icons/DeleteOutlined';
 import {get, put} from 'axios';
+import {useHistory} from 'react-router-dom';
 
 function getThemePaletteMode(palette) {
     return palette.type || palette.mode;
@@ -114,12 +115,20 @@ function EditButtons(props) {
     );
 }
 
-function RenderSelectedCard(props) {
+function Cols(props) {
+    const card = props.frontCard; // selected front card
+    const backSide = props.backCard; // selected back card
     const stylesThree = paperStyles();
-    const card = props.card;
-    const [cols, setCols] = useState([]);
-    const [id, setId] = useState(0);
+    const id = props.backCard.BACK_ID;
     const [text, setText] = useState('');
+
+    const editCols = e => {
+        e.stopPropagation();
+        e.preventDefault();
+        const text = e.target.value;
+        setText(text);
+        sendToServerBackColChanges(text, id);
+    };
 
     const sendToServerBackColChanges = (colData, id) => {
         const config = {
@@ -132,60 +141,92 @@ function RenderSelectedCard(props) {
             BACK_ID: id,
         };
         const url = `/api/cards/edit-back-col`;
-
-        return put(url, data, config);
-    };
-
-    const editCols = e => {
-        e.stopPropagation();
-        e.preventDefault();
-        const text = e.target.value;
-        const id = Number(e.target.id);
-        setId(id);
-        setText(text);
-
-        cols.map(curr => {
-            if (curr.BACK_ID === id) {
-                curr.BACK_DATA = text;
-                setCols(cols);
-            }
-        });
+        return put(url, data, config)
+            .then(() => {})
+            .catch(err => console.log(err));
     };
 
     useEffect(() => {
-        const frontId = card.FRONT_ID;
-        if (id && text) {
-            sendToServerBackColChanges(text, id);
-        }
+        setText(backSide.BACK_DATA);
+    }, [card]);
 
-        if (frontId) {
-            const url = '/api/cards/get-back-cols?frontId=' + frontId;
-            get(url)
-                .then(res => {
-                    const data = res.data;
-                    setCols(data);
-                })
-                .catch(err => console.log(err));
-        }
+    return (
+        <Paper className={stylesThree.root} elevation={0}>
+            <TextField
+                fullWidth
+                id={backSide.BACK_ID.toString()}
+                value={text || ''}
+                label={backSide.CARD_COL_ID}
+                variant='outlined'
+                onChange={editCols}
+            />
+        </Paper>
+    );
+}
+
+function RenderSelectedCard(props) {
+    const stylesThree = paperStyles();
+    const card = props.frontCard; // selected front card
+    const backCard = props.backCard; // selected back card
+    const [cols, setCols] = useState([]);
+    const [front, setFront] = useState('');
+
+    const sendToServerFrontText = (word, id) => {
+        const urlOne = `/api/cards/checkDuplicateCardName?userId=${localStorage.getItem('primaryKey')}&cardName=${id}`;
+        const urlTwo = '/api/cards/change-front-data';
+        get(urlOne)
+            .then(res => {
+                const bools = res.data.length;
+
+                if (card.FRONT_DATA !== front) {
+                    if (bools) {
+                        alert('中腹のカードでアップデートが出来ませんでした。');
+                    }
+                } else {
+                    const config = {
+                        headers: {
+                            'content-type': 'application/json',
+                        },
+                    };
+                    const data = {
+                        frontId: card.FRONT_ID,
+                        frontData: word,
+                    };
+                    put(urlTwo, data, config);
+                }
+            })
+            .catch(err => console.log(err));
+    };
+
+    const editFront = e => {
+        e.stopPropagation();
+        e.preventDefault();
+        const text = e.target.value;
+        setFront(text);
+        card.FRONT_DATA = text;
+        sendToServerFrontText(text, card.FRONT_ID);
+    };
+
+    useEffect(() => {
+        setFront(card.FRONT_DATA);
     }, [card]);
 
     return (
         <React.Fragment>
-            <Paper className={stylesThree.root} elevation={3} />
+            <Paper className={stylesThree.root} elevation={0}>
+                <TextField
+                    fullWidth
+                    id={card.FRONT_ID + ''}
+                    value={front || ''}
+                    variant='outlined'
+                    onChange={editFront}
+                    style={{height: '100%'}}
+                />
+            </Paper>
 
-            {cols.length ? (
-                cols.map(curr => {
-                    return (
-                        <Paper key={curr.BACK_ID} className={stylesThree.root} elevation={3}>
-                            <TextField
-                                id={curr.BACK_ID.toString()}
-                                value={curr.BACK_DATA}
-                                label='Filled'
-                                variant='filled'
-                                onChange={editCols}
-                            />
-                        </Paper>
-                    );
+            {backCard.length ? (
+                backCard.map(curr => {
+                    return <Cols key={curr.BACK_ID} frontCard={card} backCard={curr} />;
                 })
             ) : (
                 <div></div>
@@ -194,9 +235,10 @@ function RenderSelectedCard(props) {
     );
 }
 
-export default function StylingRowsGrid() {
+export default function CardList(props) {
     const stylesOne = tableStyles();
     const stylesTwo = paperContainerStyles();
+    const history = useHistory();
     const cols = [
         {field: 'FRONT_ID', headerName: 'ID', width: 100},
         {field: 'FRONT_DATA', headerName: 'front', width: 130},
@@ -218,10 +260,17 @@ export default function StylingRowsGrid() {
     ];
     const [rows, setRows] = useState([]);
     const [selectedCard, setSelectedCard] = useState({});
+    const [selectedBackCard, setSelectedBackCard] = useState([]);
 
     const viewCardCols = params => {
-        const card = searchCard(rows, params.id);
-        setSelectedCard(card);
+        (async () => {
+            const card = searchCard(rows, params.id);
+            const url = '/api/cards/get-back-cols?frontId=' + card.FRONT_ID;
+            const res = await get(url);
+            const data = res.data;
+            setSelectedCard(card);
+            setSelectedBackCard(data);
+        })();
     };
     const searchCard = (cardList, id) => {
         let returnCol = null;
@@ -245,7 +294,9 @@ export default function StylingRowsGrid() {
             data.forEach(curr => {
                 curr.id = curr.FRONT_ID;
             });
+            console.log('🚀 ~ file: CardList.js ~ line 292 ~ data', data);
             setRows(data);
+            history.push('/card-list');
         })();
     }, []);
 
@@ -257,9 +308,9 @@ export default function StylingRowsGrid() {
                         <DataGrid columns={cols} rows={rows} onCellClick={viewCardCols} />
                     </div>
                 </Grid>
-                <Grid item xs={12} sm={6} justifyContent='center' alignItems='center'>
+                <Grid item xs={12} sm={6}>
                     <div className={stylesTwo.root}>
-                        <RenderSelectedCard card={selectedCard} />
+                        <RenderSelectedCard frontCard={selectedCard} backCard={selectedBackCard} />
                     </div>
                 </Grid>
             </Grid>
