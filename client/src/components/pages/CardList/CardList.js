@@ -118,6 +118,8 @@ function RenderSelectedCard(props) {
     const stylesThree = paperStyles();
     const card = props.card;
     const [cols, setCols] = useState([]);
+    const [id, setId] = useState(0);
+    const [text, setText] = useState('');
 
     const sendToServerBackColChanges = (colData, id) => {
         const config = {
@@ -138,39 +140,24 @@ function RenderSelectedCard(props) {
         e.stopPropagation();
         e.preventDefault();
         const text = e.target.value;
-        console.log('🚀 ~ file: CardList.js ~ line 141 ~ RenderSelectedCard ~ text', text);
         const id = Number(e.target.id);
+        setId(id);
+        setText(text);
 
-        // let idx = -1;
-        // for (let i = 0; i < cols.length; i += 1) {
-        //     if (cols[i].BACK_ID === id) {
-        //         idx = i;
-        //         break;
-        //     }
-        // }
-        // sendToServerBackColChanges(text, id)
-        //     .then(res => {
-        //         cols[idx].BACK_DATA = text;
-        //         setCols([...cols]);
-        //     })
-        //     .catch(err => console.log(err));
-
-        cols.some(curr => {
+        cols.map(curr => {
             if (curr.BACK_ID === id) {
-                sendToServerBackColChanges(text, id)
-                    .then(res => {
-                        curr.BACK_DATA = text;
-                        setCols([...cols]);
-                    })
-                    .catch(err => console.log(err));
-                return true;
+                curr.BACK_DATA = text;
+                setCols(cols);
             }
         });
     };
 
     useEffect(() => {
         const frontId = card.FRONT_ID;
-        console.log('???');
+        if (id && text) {
+            sendToServerBackColChanges(text, id);
+        }
+
         if (frontId) {
             const url = '/api/cards/get-back-cols?frontId=' + frontId;
             get(url)
@@ -191,7 +178,7 @@ function RenderSelectedCard(props) {
                     return (
                         <Paper key={curr.BACK_ID} className={stylesThree.root} elevation={3}>
                             <TextField
-                                id={curr.BACK_ID}
+                                id={curr.BACK_ID.toString()}
                                 value={curr.BACK_DATA}
                                 label='Filled'
                                 variant='filled'
@@ -251,20 +238,16 @@ export default function StylingRowsGrid() {
 
     // call all cards after first rendering
     useEffect(() => {
-        // ! I don't know why I need two rendering. I just guess asynchronous delay.
-        if (rows.length === 0) {
-            const url = `/api/cards/call-all-of-cards?userId=` + localStorage.getItem('primaryKey');
-            get(url)
-                .then(res => {
-                    const data = res.data;
-                    data.forEach(curr => {
-                        curr.id = curr.FRONT_ID;
-                    });
-                    setRows(data);
-                })
-                .catch(err => console.log(err));
-        }
-    }, [rows]);
+        const url = `/api/cards/call-all-of-cards?userId=` + localStorage.getItem('primaryKey');
+        (async () => {
+            const res = await get(url);
+            const data = res.data;
+            data.forEach(curr => {
+                curr.id = curr.FRONT_ID;
+            });
+            setRows(data);
+        })();
+    }, []);
 
     return (
         <div>
