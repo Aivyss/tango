@@ -1,5 +1,5 @@
 import {Button, ButtonGroup, AppBar, InputBase, Toolbar, IconButton, Typography} from '@material-ui/core';
-import {Home, Add, MeetingRoom, DnsSharp, Pageview, Search, ViewCarousel, Inbox} from '@material-ui/icons';
+import {Home, Add, MeetingRoom, DnsSharp, Pageview, Search, ViewCarousel, Inbox, Forum} from '@material-ui/icons';
 import {alpha, makeStyles} from '@material-ui/core/styles';
 import {useHistory} from 'react-router-dom';
 import {get} from 'axios';
@@ -116,6 +116,10 @@ export default function TopBar(props) {
         props.handleCreateCardCategoryDialog(!props.createCardCategoryDialogIsOpen);
     };
 
+    const openForumPage = () => {
+        history.push('/forum');
+    };
+
     return (
         <div className={classes.root}>
             <AppBar position='static'>
@@ -134,14 +138,14 @@ export default function TopBar(props) {
                     </Typography>
                     <div className={classes.btnGroup}>
                         <ButtonGroup variant='contained' color='default' aria-label='contained primary button group'>
+                            <Button onClick={goToCardList}>
+                                <Pageview fontSize='small' />
+                                Card List
+                            </Button>
                             <Button onClick={openCreateDeckDialog}>
                                 <Add fontSize='small' />
                                 <Inbox />
                                 Deck
-                            </Button>
-                            <Button onClick={goToCardList}>
-                                <Pageview fontSize='small' />
-                                Card List
                             </Button>
                             <Button onClick={handleCreateCardCategoryDialog}>
                                 <Add fontSize='small' />
@@ -152,6 +156,10 @@ export default function TopBar(props) {
                                 <Add fontSize='small' />
                                 <ViewCarousel />
                                 Card
+                            </Button>
+                            <Button onClick={openForumPage}>
+                                <Forum />
+                                Forum
                             </Button>
                             <Button onClick={doLogout}>
                                 <MeetingRoom />
