@@ -4,7 +4,8 @@ module.exports = {
         es2021: true,
         node: true,
     },
-    extends: ['eslint:recommended', 'airbnb', 'prettier', 'plugin:react/recommended'],
+    extends: ['eslint:recommended', 'plugin:react/recommended', 'plugin:@typescript-eslint/recommended', 'airbnb'],
+    parser: '@typescript-eslint/parser',
     parserOptions: {
         ecmaFeatures: {
             jsx: true,
@@ -12,8 +13,9 @@ module.exports = {
         ecmaVersion: 12,
         sourceType: 'module',
     },
-    plugins: ['react', 'prettier'],
+    plugins: ['react', '@typescript-eslint', 'prettier'],
     rules: {
+        indent: ['error', 4],
         'no-unused-vars': 'warn',
         'prettier/prettier': ['error', {endOfLine: 'auto'}],
         'no-console': 'off',
@@ -21,5 +23,7 @@ module.exports = {
         'object-shorthand': 'off',
         'class-methods-use-this': 'off',
         'max-len': ['error', 120, 2],
+				'no-underscore-dangle': 'off',
+        'max-classes-per-file': 'off',
     },
 };

@@ -24,3 +24,7 @@ yarn-error.log*
 
 # database
 /database.json
+
+# transcompile
+/server/dist
+tsconfig.json
