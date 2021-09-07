@@ -15,6 +15,6 @@ app.use(express.urlencoded({extended: true}));
 // * routing
 app.use('/api', route);
 
-// * proxy port
+// * proxy port/
 const port = process.env.PORT || 5001;
 app.listen(port, () => console.log('Listening on port= ', port));
