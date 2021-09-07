@@ -1,20 +1,18 @@
 import React, {useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
-import {createStyles, Theme, makeStyles} from '@material-ui/core/styles';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
+import {Box, ListItem, ListItemText} from '@material-ui/core';
+import {makeStyles} from '@material-ui/core/styles';
 import {FixedSizeList, ListChildComponentProps} from 'react-window';
 import {useHistory} from 'react-router';
-import {Box} from '@material-ui/core';
 import axios, {AxiosResponse} from 'axios';
 
 // * Recoils
 import {useRecoilState} from 'recoil';
-import {allDeckState, cardKindState, deckInfoState, targetDeckIdState} from '../../_recoil';
+import {deckNameState, allDeckState, cardKindState, deckInfoState, targetDeckIdState} from '../../_recoil';
 import {DeckTable, KindTable} from '../../_recoil/dbs';
 
 // * CSS Styles
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles(theme => ({
     root: {
         width: '100%',
         height: 400,
@@ -44,109 +42,65 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
 }));
 
-// * Props Interface
+// * Props interface
 interface PropsDeckList {
+    deckList: DeckTable[];
     setDeckList(deckList: DeckTable[]): void;
-    setAllCardCategories(categ: KindTable[]): void;
+    setAllCardCategories(kindList: KindTable[]): void;
     setDeckInfo(info: {newCard: number; reviewCard: number}): void;
     setTargetDeck(deckId: number): void;
+    setTargetDeckName(name: string): void;
+}
+
+interface PropsRenderRow {
+    setDeckInfo(info: {newCard: number; reviewCard: number}): void;
+    setTargetDeck(deckId: number): void;
+    setTargetDeckName(name: string): void;
     deckList: DeckTable[];
 }
 
-// * Container Components
+// * Container Component
 export default function Container() {
-    const [allDecks, setAllDecks] = useRecoilState(allDeckState);
-    const [categs, setCategs] = useRecoilState(cardKindState);
-    const [deckInfo, setDeckInfo] = useRecoilState(deckInfoState);
-    const [targetDeckId, setTargetDeckId] = useRecoilState(targetDeckIdState);
-
-    const setDeckList = (deckList: DeckTable[]) => {
-        setAllDecks(deckList);
-    };
-    const setAllCardCategories = (categ: KindTable[]) => {
-        setCategs(categ);
-    };
-    const setDeckInfoFunc = (info: {newCard: number; reviewCard: number}) => {
-        setDeckInfo(info);
-    };
-    const setTargetDeck = (deckId: number) => {
-        setTargetDeckId(deckId);
-    };
+    const [deckId, setDeckId] = useRecoilState(targetDeckIdState);
+    const [deckName, setDeckName] = useRecoilState(deckNameState);
+    const [deckList, setDeckList] = useRecoilState(allDeckState);
+    const [cardKinds, setCardKinds] = useRecoilState(cardKindState);
+    const [info, setInfo] = useRecoilState(deckInfoState);
 
     return (
-        <VirtualizedList
+        <DeckList
+            deckList={deckList}
             setDeckList={setDeckList}
-            setAllCardCategories={setAllCardCategories}
-            setDeckInfo={setDeckInfoFunc}
-            setTargetDeck={setTargetDeck}
-            deckList={allDecks}
+            setAllCardCategories={setCardKinds}
+            setDeckInfo={setInfo}
+            setTargetDeck={setDeckId}
+            setTargetDeckName={setDeckName}
         />
     );
 }
 
 // * Presentational Components
-function VirtualizedList(props: PropsDeckList) {
-    const id = localStorage.getItem('primaryKey');
-    const classes = useStyles();
-    const callDecksFromApi = (param: string) => {
-        const id = param;
-        const url = '/api/decks/callAllDecks?id=' + id;
+function RenderRow(props: ListChildComponentProps<PropsRenderRow>) {
+    // props의 구조는 { data, style, index, isScrolling }으로 되어있다.
+    const {index, style, data} = props;
+    const {setDeckInfo, setTargetDeckName, setTargetDeck, deckList} = data;
+    const history = useHistory();
+
+    const getDeckInfo = (deckId: string) => {
+        const url = '/api/decks/get-deck-info/?deckId=' + deckId;
 
         return axios
             .get(url)
-            .then((res: AxiosResponse) => {
-                console.log('get res=', res.data);
-                props.setDeckList(res.data);
-
-                return res.data;
+            .then((res: AxiosResponse<{newCard: number; reviewCard: number}>) => {
+                const data = res.data;
+                console.log('deckList ~ deckInfo ~ apicall:', data);
+                setDeckInfo(data);
+                return data;
             })
-            .catch(() => {
-                console.log('failed deck loading');
+            .catch(err => {
+                console.log(err);
             });
     };
-    const callCardCategoryFromApi = (id: string) => {
-        const url = '/api/cards/call-all-card-categories?userId=' + id;
-
-        axios.get(url).then((res: AxiosResponse) => {
-            const data = res.data;
-            props.setAllCardCategories(data);
-        });
-    };
-
-    useEffect(() => {
-        console.log('useEffect 덱콜 카드콜');
-
-        callDecksFromApi(id!);
-        callCardCategoryFromApi(id!);
-    }, [id]);
-
-    return (
-        <div className={classes.centerBox}>
-            <div>
-                <div className={classes.root}>
-                    <Box boxShadow={3}>
-                        <FixedSizeList
-                            height={400}
-                            width={600}
-                            itemSize={72}
-                            itemCount={props.deckList ? props.deckList.length : 0}
-                            itemData={[props.deckList, props]}
-                        >
-                            {RenderRow}
-                        </FixedSizeList>
-                    </Box>
-                </div>
-            </div>
-        </div>
-    );
-}
-
-function RenderRow(props: ListChildComponentProps) {
-    // props의 구조는 { data, style, index, isScrolling }으로 되어있다.
-    const {index, style, data} = props;
-    const deckList = data[0];
-    const prevProps = data[1];
-    const history = useHistory();
 
     return (
         <ListItem
@@ -154,10 +108,11 @@ function RenderRow(props: ListChildComponentProps) {
             style={style}
             key={index}
             onClick={() => {
-                const deckId = Number(deckList[index].DECK_ID);
-                if (prevProps !== null) {
-                    prevProps.setDeckInfo(deckId).then(() => {
-                        prevProps.setTargetDeck(deckId, deckList[index].DECK_NAME);
+                const deckId = deckList[index].DECK_ID;
+                if (deckList.length > 0) {
+                    getDeckInfo(deckId.toString()).then(() => {
+                        setTargetDeck(deckId);
+                        setTargetDeckName(deckList[index].DECK_NAME);
                         history.push('/deck-room');
                     });
                 }
@@ -172,3 +127,63 @@ RenderRow.propTypes = {
     index: PropTypes.number.isRequired,
     style: PropTypes.object.isRequired,
 };
+
+function DeckList(props: PropsDeckList) {
+    const id = localStorage.getItem('primaryKey');
+    const classes = useStyles();
+    const callDecksFromApi = () => {
+        const url = '/api/decks/callAllDecks?id=' + id;
+
+        return axios
+            .get(url)
+            .then(res => {
+                console.log('get res=', res.data);
+                props.setDeckList(res.data);
+
+                return res.data;
+            })
+            .catch(() => {
+                console.log('failed deck loading');
+            });
+    };
+    const callCardCategoryFromApi = () => {
+        const url = '/api/cards/call-all-card-categories?userId=' + id;
+
+        axios.get(url).then(res => {
+            const data = res.data;
+            props.setAllCardCategories(data);
+        });
+    };
+
+    useEffect(() => {
+        console.log('useEffect 덱콜 카드콜');
+
+        callDecksFromApi();
+        callCardCategoryFromApi();
+    }, [id]);
+
+    return (
+        <div className={classes.centerBox}>
+            <div>
+                <div className={classes.root}>
+                    <Box boxShadow={3}>
+                        <FixedSizeList
+                            height={400}
+                            width={600}
+                            itemSize={72}
+                            itemCount={props.deckList ? props.deckList.length : 0}
+                            itemData={{
+                                setDeckInfo: props.setDeckInfo,
+                                setTargetDeck: props.setTargetDeck,
+                                setTargetDeckName: props.setTargetDeckName,
+                                deckList: props.deckList,
+                            }}
+                        >
+                            {RenderRow}
+                        </FixedSizeList>
+                    </Box>
+                </div>
+            </div>
+        </div>
+    );
+}

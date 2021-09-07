@@ -1,24 +1,20 @@
-import fs from 'fs';
 import mysql from 'mysql2/promise';
-import mysqlBasic from 'mysql2';
+import mysqlBasic, {PoolOptions} from 'mysql2';
+import fs from 'fs';
+
+interface IConf {
+    host: string;
+    user: string;
+    password: string;
+    port: string;
+    database: string;
+}
 
 // database settings
-const data = fs.readFileSync('./database.json');
-const conf = JSON.parse(JSON.stringify(data));
-const pool = mysql.createPool({
-    host: conf.host,
-    user: conf.user,
-    password: conf.password,
-    port: conf.port,
-    database: conf.database,
-});
-const conn = mysqlBasic.createConnection({
-    host: conf.host,
-    user: conf.user,
-    password: conf.password,
-    port: conf.port,
-    database: conf.database,
-});
+const data = fs.readFileSync(__dirname + '\\database.json', 'utf8');
+const conf = JSON.parse(data) as PoolOptions;
+const pool = mysql.createPool(conf);
+const conn = mysqlBasic.createConnection(conf);
 
-// exports
+// exports //
 export {conn, pool};

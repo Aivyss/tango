@@ -2,7 +2,7 @@ import React from 'react';
 import {Dialog} from '@material-ui/core';
 import {Grow} from '@material-ui/core';
 import {Button} from '@material-ui/core';
-import TangoCard from './TangoCard';
+import TangoCard from '../modules/TangoCard';
 import SideNav from '../Navs/SideNav';
 
 // * Recoil

@@ -6,8 +6,8 @@ import Container from '@material-ui/core/Container';
 import {makeStyles} from '@material-ui/core/styles';
 import Badge from '@material-ui/core/Badge';
 import ViewCarouselIcon from '@material-ui/icons/ViewCarousel';
-import {RouteComponentProps} from 'react-router-dom';
 import axios, {AxiosResponse} from 'axios';
+import {useHistory} from 'react-router-dom';
 
 // * Recoils
 import {useRecoilState} from 'recoil';
@@ -43,7 +43,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 // * Container Component
-export default function ContainerComp(props: RouteComponentProps) {
+export default function ContainerComp() {
     const [deckInfo, setDeckInfo] = useRecoilState(deckInfoState);
     const [deckId, setDeckId] = useRecoilState(targetDeckIdState);
     const [studyCards, setStudyCards] = useRecoilState(studyCardsState);
@@ -53,7 +53,6 @@ export default function ContainerComp(props: RouteComponentProps) {
         <DeckStatus
             deckInfo={deckInfo}
             deckId={deckId!}
-            route={props}
             setStudyCards={setStudyCards}
             handleStudyModeDialog={setStudyMode}
         />
@@ -66,7 +65,6 @@ interface PropsDeckStatus {
     deckId: number;
     setStudyCards(studyCard: IStudyCard[]): void;
     handleStudyModeDialog(bools: boolean): void;
-    route: RouteComponentProps;
 }
 
 // * Presentational Component
@@ -74,6 +72,7 @@ function DeckStatus(props: PropsDeckStatus) {
     const deckInfo = props.deckInfo;
     const deckId = props.deckId;
     const classes = useStyles();
+    const history = useHistory();
 
     const clickStart = () => {
         const url = `/api/decks/call-study-card?deckId=${deckId}`;
@@ -89,7 +88,7 @@ function DeckStatus(props: PropsDeckStatus) {
     };
 
     const clickCancel = () => {
-        props.route.history.push('/');
+        history.push('/');
     };
 
     return (

@@ -1,8 +1,8 @@
 /* eslint no-param-reassign: ["error", { "props": true, "ignorePropertyModificationsFor": ["curr"] }] */
 import express from 'express';
-import {conn, pool} from '../database';
-import {RowDataPacket, FieldPacket} from 'mysql2';
+import {Connection, Pool, PoolConnection, RowDataPacket, FieldPacket} from 'mysql2';
 import {FrontCardTable, BackCardTable} from '../database/dbInterfaces';
+import {conn, pool} from '../database';
 const router = express.Router();
 
 interface StudyCard extends FrontCardTable {
@@ -72,10 +72,15 @@ router.get('/get-deck-info', (req, res) => {
         RAND()
     `;
     (async () => {
-        const connection = await pool.getConnection();
+        let connection!: PoolConnection;
+        await pool.getConnection(async (err, conn) => {
+            if (err) throw err;
+            connection = conn;
+        });
         try {
             // FieldPacket 인자는 아래와 같이 SQL 실행 결과 필드값에 대한 정보를 리턴합니다. 활용할 일이 거의 없으므로 field 인자는 생략해도 됩니다.
-            const newRows = (await connection.query(sqlOne, params))[0] as RowDataPacket[];
+            const newRows = await connection.query(sqlOne, params);
+            console.log('🚀 ~ file: deckRoutes.ts ~ line 83 ~ newRows', newRows);
             const newCard = JSON.parse(JSON.stringify(newRows[0]['COUNT(*)'])) as number;
             console.log('🚀 ~ file: decksRoutes.js ~ line 59 ~ newCard', newCard);
             const reviewRows = (await connection.query(sqlTwo, params))[0] as RowDataPacket[];
@@ -95,7 +100,11 @@ router.get('/get-deck-info', (req, res) => {
 // 공부할 카드 호출
 router.get('/call-study-card', (req, res) => {
     (async () => {
-        const connection = await pool.getConnection();
+        let connection!: PoolConnection;
+        await pool.getConnection((err, conn) => {
+            if (err) throw err;
+            connection = conn;
+        });
 
         try {
             const deckId = Number(req.query.deckId);
@@ -117,7 +126,7 @@ router.get('/call-study-card', (req, res) => {
             where
                 FRONT_ID = ?
             `;
-            const [rows] = await connection.query(sqlOne, [deckId]);
+            const rows = await connection.query(sqlOne, [deckId]);
             const cardRows = JSON.parse(JSON.stringify(rows)) as FrontCardTable[];
 
             const refinedRows: StudyCard[] = await Promise.all(

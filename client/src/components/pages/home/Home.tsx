@@ -6,7 +6,7 @@ import CreateDeckDialog from '../../dialogs/CreateDeckDialog';
 import CreateCardDialog from '../../dialogs/CreateCardDialog';
 import CreateCardCategoryDialog from '../../dialogs/CreateCardCategoryDialog';
 import DeckRoom from '../deckroom/DeckRoom';
-import CardList from '../../dialogs/';
+import CardList from '../cardList/CardList';
 import ForumHome from '../forum/ForumHome';
 
 // * Container Component

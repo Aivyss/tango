@@ -1,7 +1,8 @@
 /* eslint no-param-reassign: ["error", { "props": false }] */
 import express from 'express';
-import {conn, pool} from '../database';
 import {RowDataPacket} from 'mysql2';
+import {Connection, Pool, PoolConnection} from 'mysql2';
+import {conn, pool} from '../database';
 const router = express.Router();
 
 // 카드이름 중복조회
@@ -20,10 +21,16 @@ router.get('/checkDuplicateCardName', (req, res) => {
 // 카드 카테고리 생성
 router.post('/create-card-category', (req, res) => {
     (async () => {
-        const connection = await pool.getConnection();
+        let connection!: PoolConnection;
+
+        await pool.getConnection(async (err, conn2) => {
+            connection = conn2;
+        });
 
         try {
-            await connection.beginTransaction();
+            await connection.beginTransaction(async err => {
+                if (err) throw err;
+            });
 
             const paramOne: string[] | number[] = [req.body.cardName, req.body.userId];
             const paramTwo: string[] | number[] = req.body.backFields;
@@ -37,7 +44,7 @@ router.post('/create-card-category', (req, res) => {
                 (?, ?)`;
             await connection.query(sqlOne, paramOne);
 
-            const [rows] = await connection.query('SELECT LAST_INSERT_ID()');
+            const rows = await connection.query('SELECT LAST_INSERT_ID()');
             const kindTablePK = JSON.parse(JSON.stringify(rows))[0]['LAST_INSERT_ID()'] as number;
 
             const testList = await Promise.all(
@@ -52,8 +59,9 @@ router.post('/create-card-category', (req, res) => {
             await connection.commit();
             res.send(true);
         } catch (err) {
-            console.log(err);
-            await connection.rollback();
+            await connection.rollback(() => {
+                console.log(err);
+            });
             res.send(false);
         } finally {
             connection.release();
@@ -123,7 +131,11 @@ router.post('/create-card', (req, res) => {
     } = req.body;
 
     (async () => {
-        const connection = await pool.getConnection();
+        let connection!: PoolConnection;
+        await pool.getConnection((err, conn) => {
+            if (err) throw err;
+            connection = conn;
+        });
 
         try {
             // 프론트 인서트문
@@ -145,7 +157,7 @@ router.post('/create-card', (req, res) => {
                 ?, ?, ?
             )`;
             await connection.query(sqlOne, [front as string, deckId as number, cardId as number]);
-            let [rows] = await connection.query(sqlTwo);
+            let rows = await connection.query(sqlTwo);
             const insertId = JSON.parse(JSON.stringify(rows))[0]['LAST_INSERT_ID()'] as number;
 
             Promise.all(
@@ -156,8 +168,9 @@ router.post('/create-card', (req, res) => {
             await connection.commit();
             res.send(true);
         } catch (err) {
-            console.log(err);
-            await connection.rollback();
+            await connection.rollback(() => {
+                console.log(err);
+            });
             res.send(false);
         } finally {
             connection.release();
