@@ -1,7 +1,7 @@
 import React, {useState, useEffect, ChangeEvent} from 'react';
 import {DataGrid, GridColumns, GridRowsProp, GridRowParams} from '@mui/x-data-grid';
-import {createTheme, darken, lighten, Theme} from '@material-ui/core/styles';
-import {makeStyles} from '@material-ui/styles';
+import {createTheme, darken, lighten} from '@material-ui/core/styles';
+import {makeStyles, Theme} from '@material-ui/core/styles';
 import {Grid, IconButton, Paper, TextField} from '@material-ui/core';
 import Edit from '@material-ui/icons/Edit';
 import DeleteOutlined from '@material-ui/icons/DeleteOutlined';

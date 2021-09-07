@@ -275,7 +275,7 @@ function CreateCardDialog(props: PropsCardDialog) {
     useEffect(() => {
         if (success) {
             // 디스플레이가 보이는 중
-            setTimeout(setSuccess, 3000, false);
+            setTimeout(setSuccess, 3000, {display: 'none'});
         }
     }, [success]);
 

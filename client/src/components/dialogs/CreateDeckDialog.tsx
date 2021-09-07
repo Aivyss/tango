@@ -12,7 +12,7 @@ import axios from 'axios';
 
 // * Recoils
 import {useRecoilState} from 'recoil';
-import {cDOpenState} from '../../_recoil';
+import {dDOpenState} from '../../_recoil';
 
 // * Props Interface
 interface PropsDeckDialog {
@@ -22,7 +22,7 @@ interface PropsDeckDialog {
 
 // * Container Component
 export default function Container() {
-    const [deckDialog, setDeckDialog] = useRecoilState(cDOpenState);
+    const [deckDialog, setDeckDialog] = useRecoilState(dDOpenState);
 
     const closeDeckDialog = () => {
         setDeckDialog(false);
