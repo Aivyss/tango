@@ -1,7 +1,7 @@
 import express from 'express';
-import {UserTable} from '../database/dbInterfaces';
-import {Connection, Pool, PoolConnection, RowDataPacket, FieldPacket} from 'mysql2';
 import {conn, pool} from '../database';
+import {UserTable} from '../database/dbInterfaces';
+import {RowDataPacket} from 'mysql2';
 
 const pbkdf2Password = require('pbkdf2-password');
 const router = express.Router();
