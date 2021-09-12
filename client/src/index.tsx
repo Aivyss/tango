@@ -2,13 +2,17 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
+import {ThemeProvider} from 'styled-components';
+import theme from './assets/styles/theme';
 import reportWebVitals from './reportWebVitals';
-import {RecoilRoot, atom, selector, useRecoilState, useRecoilValue} from 'recoil';
+import {RecoilRoot} from 'recoil';
 
 ReactDOM.render(
-    <RecoilRoot>
-        <App />
-    </RecoilRoot>,
+    <ThemeProvider theme={theme}>
+        <RecoilRoot>
+            <App />
+        </RecoilRoot>
+    </ThemeProvider>,
     document.getElementById('root'),
 );
 

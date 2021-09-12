@@ -61,7 +61,7 @@ function App(props: AppProps) {
     return (
         <div>
             <BrowserRouter>
-                {userId && isLogined ? (
+                {userId ? (
                     <Route path='/'>
                         <Home />
                     </Route>
