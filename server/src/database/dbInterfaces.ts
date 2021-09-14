@@ -39,3 +39,8 @@ export interface BackCardTable {
     CARD_COL_ID: number;
     BACK_DATA: string;
 }
+
+export interface BoardCategTable {
+    BOARD_PK: number;
+    CATEG_NAME: string;
+}

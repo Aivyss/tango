@@ -1,8 +1,48 @@
-import React from 'react';
-import styles from '../../../assets/styles/forum.module.css';
+import React, {useState, useEffect} from 'react';
+import styles from '../../../assets/styles/pages/forum.module.css';
 import className from 'classnames';
+import {makeStyles, createStyles} from '@material-ui/core/styles';
+import Pagination from '@material-ui/lab/Pagination';
+import Button from '@material-ui/core/Button';
+import Feed from '../../modules/Feed';
+import {BoardCategTable} from '../../../_recoil/dbs';
+import axios from 'axios';
 
-export default function ForumHome() {
+// * CSS styles
+const useStyles = makeStyles(theme =>
+    createStyles({
+        root: {
+            '& > *': {
+                marginTop: theme.spacing(2),
+            },
+        },
+        btns: {
+            margin: '5px',
+        },
+    }),
+);
+
+// * Container Component
+export default function Container() {
+    return <ForumHome />;
+}
+
+// * Presentational Component
+function ForumHome() {
+    const classes = useStyles();
+    const [targetCateg, setTargetCateg] = useState(-1);
+    const [categs, setCategs] = useState([] as BoardCategTable[]);
+
+    useEffect(() => {
+        axios.get<BoardCategTable[]>('/forum/getCategs').then(res => {
+            setCategs(res.data);
+        });
+    }, []);
+
+    const handleClickCateg = (categId: number) => {
+        setTargetCateg(categId);
+    };
+
     return (
         <div className={styles.wrapper}>
             <div className={styles.container}>
@@ -11,31 +51,24 @@ export default function ForumHome() {
                 </header>
                 <section className={styles.content}>
                     <nav className={styles.categ__side}>
-                        <button> col1</button>
-                        <button> col2</button>
-                        <button> col3</button>
-                        <button> col4</button>
-                        <button> col5</button>
+                        {categs.map(curr => (
+                            <button className={styles.btns} onClick={handleClickCateg(curr.BOARD_PK)}>
+                                {curr.CATEG_NAME}
+                            </button>
+                        ))}
                     </nav>
 
                     <main className={styles.center__content}>
-                        <div className={styles.dd}>
-                            <ol className={className(styles.kanban, styles['To-do'])}>
-                                <div className={styles.kanban__title}>title1</div>
-                                <p className={styles.kanban__content}>컨텐츠에용</p>
-                                <p className={styles.kanban__author}>author1</p>
-                            </ol>
-                            <ol className={className(styles.kanban, styles['To-do'])}>
-                                <div className={styles.kanban__title}>title1</div>
-                                <p className={styles.kanban__content}>컨텐츠에용</p>
-                                <p className={styles.kanban__author}>author1</p>
-                            </ol>
-                            <ol className={className(styles.kanban, styles['To-do'])}>
-                                <div className={styles.kanban__title}>title1</div>
-                                <p className={styles.kanban__content}>컨텐츠에용</p>
-                                <p className={styles.kanban__author}>author1</p>
-                            </ol>
-                        </div>
+                        <Button
+                            className={classes.btns}
+                            variant='contained'
+                            color='primary'
+                            disableElevation
+                            size='large'
+                        >
+                            Disable elevation
+                        </Button>
+                        {targetCateg === -1 ? '' : <Feed categ={targetCateg} />}
                     </main>
 
                     <aside>aside</aside>

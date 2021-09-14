@@ -1,0 +1,209 @@
+.dd ol {
+    box-sizing: border-box;
+    margin: 8px 2.5%;
+    transition: border-c or 2s ease, all 0.1s ease;
+}
+
+.dd ol.list {
+    padding-top: 2em;
+    padding-left: 15px;
+    max-width: 650px;
+    margin: 0 auto;
+}
+
+.dd ol.list .text {
+    float: right;
+    width: 60%;
+}
+
+.dd ol.list h3,
+.dd ol.list .actions,
+.dd ol.list label {
+    float: left;
+    width: 30%;
+}
+
+.dd ol.list > li,
+.dd ol.list > h3 {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.dd ol.list > h2 {
+    padding-bottom: 6px;
+}
+
+.dd ol.list.To-do {
+    border-left: 2px solid #ffb300;
+}
+
+.dd ol.list.Gone {
+    border-left: 2px solid #ff3d00;
+}
+
+.dd ol.list.progress {
+    border-left: 2px solid #29b6f6;
+}
+
+.dd ol.list.Done {
+    border-left: 2px solid #8bc34a;
+}
+
+.dd ol.kanban:hover {
+    color: #8bc34a;
+    will-change: box-shadow;
+    transition: box-shadow 0.2s cubic-bezier(0.4, 0, 1, 1), background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+        color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 5px 6px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -6px rgba(0, 0, 0, 0.2), 2px 5px 3px 0 rgba(0, 0, 0, 0.12);
+    cursor: pointer;
+}
+
+.dd ol.kanban.To-do {
+    border-top: 5px solid #ffb300;
+}
+
+.dd ol.kanban.Gone {
+    border-top: 5px solid #ff3d00;
+}
+
+.dd ol.kanban.progress {
+    border-top: 5px solid #29b6f6;
+}
+
+.dd ol.kanban.Done {
+    border-top: 5px solid #8bc34a;
+}
+
+.dd ol.kanban {
+    border-top: 5px solid #78909c;
+    width: 20%;
+    height: auto;
+    max-width: 95%;
+    min-width: 95%;
+    display: inline-block;
+    vertical-align: top;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+    flex-direction: column;
+    min-height: 30px;
+    z-index: 1;
+    position: relative;
+    background: #fff;
+    padding: 1em;
+    border-radius: 5px;
+}
+
+.kanban__author {
+    text-align: right;
+    color: rgba(0, 0, 0, 0.4);
+    margin: 0;
+}
+
+.dd {
+    position: relative;
+    display: block;
+    list-style: none;
+}
+
+.dd-list {
+    display: block;
+    position: relative;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.dd-list .dd-list {
+    padding-left: 30px;
+}
+
+.dd-collapsed .dd-list {
+    display: none;
+}
+
+.dd-item {
+    display: block;
+    margin: 5px 0;
+    padding: 5px 10px;
+    color: #333;
+    text-decoration: none;
+    font-weight: bold;
+    border: 1px solid #ccc;
+    background: #fafafa;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+
+.dd-item:hover {
+    background: #fff;
+}
+
+.dd-item > .btns {
+    display: block;
+    position: relative;
+    cursor: move;
+    float: left;
+    width: 25px;
+    height: 20px;
+    margin: 5px 0;
+    padding: 0;
+    text-indent: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    border: 0;
+    background: transparent;
+    font-size: 12px;
+    line-height: 1;
+    text-align: center;
+    font-weight: bold;
+}
+
+.dd-item > .btns:before {
+    content: '+';
+    display: block;
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    text-indent: 0;
+}
+
+.dd-item > .btns[data-action='collapse']:before {
+    content: '<i class="material-icons">filter_none</i>';
+}
+
+.dd-placeholder,
+.dd-empty {
+    margin: 5px 0;
+    padding: 0;
+    min-height: 30px;
+    background: #e0e0e0;
+    border: 1px dashed #b6bcbf;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+
+.dd-empty {
+    border: 1px dashed #bbb;
+    min-height: 100px;
+    background-color: #e0e0e0;
+    background-size: 60px 60px;
+    background-position: 0 0, 30px 30px;
+}
+
+.dd-dragel {
+    position: absolute;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+.dd-dragel > .dd-item .dd-handle {
+    margin-top: 0;
+    cursor: move;
+}
+
+.dd-dragel .dd-item {
+    -webkit-box-shadow: 2px 4px 6px 0 rgba(0, 0, 0, 0.5);
+    box-shadow: 2px 4px 6px 0 rgba(0, 0, 0, 0.5);
+    cursor: move;
+}

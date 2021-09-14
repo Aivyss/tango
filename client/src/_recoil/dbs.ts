@@ -40,6 +40,7 @@ export interface BackCardTable {
     BACK_DATA: string;
 }
 
-export interface IStudyCard extends FrontCardTable {
-    BACK_COLS: BackCardTable[];
+export interface BoardCategTable {
+    BOARD_PK: number;
+    CATEG_NAME: string;
 }

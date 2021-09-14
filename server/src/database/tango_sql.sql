@@ -1,3 +1,4 @@
+-- ACCOUNT TABLES
 create table USER_TABLE (
 	ID INT primary KEY auto_increment
 	,STRING_ID VARCHAR(60)
@@ -8,6 +9,7 @@ create table USER_TABLE (
 alter table user_table add PW_SALT VARCHAR(2000) not null;
 alter table USER_TABLE modify PASSWORD VARCHAR(2000);
 
+-- STUDY TABLES
 create table DECK_TABLE (
 	DECK_ID INT primary key auto_increment
 	,CREATE_DATE DATETIME default CURRENT_TIMESTAMP
@@ -127,6 +129,60 @@ alter table CARD_FRONT_TABLE
 		(KIND_ID) 
 	references 
 		KIND_OF_CARD_TABLE(KIND_ID);
+
+-- FORUM TABLES
+CREATE TABLE BOARD_CATEG_TABLE (
+	BOARD_PK INT PRIMARY KEY AUTO_INCREMENT,
+	CATEG_NAME VARCHAR(30) NOT NULL
+);
+
+create table FEED_TABLE (
+	FEED_PK INT primary key auto_increment,
+	USER_ID INT not null,
+	BOARD_PK INT not null,
+	TITLE VARCHAR(100) not null,
+	FEED_CONTENT VARCHAR(2000) not null
+);
+alter table FEED_TABLE
+	add constraint FEED_TABLE_BOARD_PK_FOREIGN_KEY
+	foreign key (BOARD_PK)
+	references BOARD_CATEG_TABLE(BOARD_PK);
+alter table feed_table 
+	add constraint FEED_TABLE_USER_ID_FOREIGN_KEY
+	foreign key (USER_ID)
+	references USER_TABLE(ID);
+
+create table COMMENT_TABLE (
+	COMMENT_PK INT primary key auto_increment,
+	FEED_PK INT not null,
+	USER_ID INT not null,
+	PARENT_PK INT,
+	COMMENT_ORDER INT not null default 0,
+	COMMENT_DEPTH INT not null default 0,
+	COMMENT_TEXT VARCHAR(100) not null,
+	CREATE_DATE DATETIME default CURRENT_TIMESTAMP
+);
+alter table comment_table 
+	add constraint COMMENT_TABLE_FEED_PK_FOREIGN_KEY
+	foreign key (FEED_PK)
+	references FEED_TABLE(FEED_PK);
+alter table comment_table 
+	add constraint COMMENT_TABLE_USER_ID_FOREIGN_KEY
+	foreign key (USER_ID)
+	references USER_TABLE(ID);
+alter table comment_table 
+	add constraint COMMENT_TABLE_PARENT_PK_FOREIGN_KEY
+	foreign key (PARENT_PK)
+	references COMMENT_TABLE(COMMENT_PK);
+
+-- basic board categ
+insert into BOARD_CATEG_TABLE(CATEG_NAME) values ('英語');
+insert into BOARD_CATEG_TABLE(CATEG_NAME) values ('中国語');
+insert into BOARD_CATEG_TABLE(CATEG_NAME) values ('日本語');
+insert into BOARD_CATEG_TABLE(CATEG_NAME) values ('韓国語');
+insert into BOARD_CATEG_TABLE(CATEG_NAME) values ('スペイン語');
+insert into BOARD_CATEG_TABLE(CATEG_NAME) values ('フランス語');
+insert into BOARD_CATEG_TABLE(CATEG_NAME) values ('その他');
 
 -- * IF YOU WANT CHANGE SOME CONSTRAINT, SEARCH LIEK THAT
 -- ! SHOW INDEX FROM DECK_TABLE;
